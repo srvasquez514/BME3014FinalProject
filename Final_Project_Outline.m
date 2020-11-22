@@ -72,10 +72,10 @@ title('Low Pass Filtered Heart Condition Data - 1 Second')
 % ylabel('Pressure (mmHg)')
 % title('Low Pass Filtered Heart Condition Data - 1 Second')
 %% Stop
-if heartwaveform == 1
-    %filter for healthy hearts
-elseif heartwaveform == 2
-   %filter for infracted hearts 
+if heartwaveform == 1  %filter for healthy hearts
+    %filtered = filter(LPH, heartwaveform) Make different lpfilt for <3TYPE
+elseif heartwaveform == 2  %filter for infracted hearts 
+    %filtered = filter(LPI, heartwaveform)
 else
     disp('Invalid Heart State input. Please try again.')
 end
