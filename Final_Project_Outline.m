@@ -1,6 +1,6 @@
 %% Name and Group Number
 % Names = Azka Siddiq, Claire Nicolas, Sarah Vasquez 
-%GroupNum = 5
+% GroupNumber = 5
 %% Import Data - Azka
 % Please remember that this code must prompt the user for the file name.Use
 % funvtion inputdlg(). Having done so, use the filename input to import
