@@ -16,6 +16,15 @@
 %     fname = sprintf('%s_%s.csv',heartcondition(heartcondition_identifier),num2str(i));
 %     rawdata = importdata(fname,',',23);
 % end
+
+%This code imports the original files and removes the header
+%I'm leaving it commented for now because it's a lot eaasier to run the code and check progress when you don't... 
+    %have to input the file name everytime -AZKA
+%prompt=inputdlg('What is the filename?');
+%fname=char(prompt);  
+%rawdata=dlmread(fname,',',23,0);
+
+
 fname = 'Infarct1.csv';
 rawdata = importdata(fname);
 time = rawdata.data(:,1);
