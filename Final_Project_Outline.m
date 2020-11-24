@@ -116,11 +116,12 @@ title('Peaks of Heart Pressure Waveform')
 % plot(lowtime(loc_min),lowfilt(loc_min), 'o', lowtime, lowfilt(1:end-1));
 % xlabel('Time (s)')
 % ylabel('Pressure (mmHg)')
-% title('Diastolic Pressure before filtering');
+% 
 figure
 [pks,locs] = findpeaks(filtdata);
 figure
 plot(time(locs), filtdata(locs), 'or', time, filtdata)
+title('Systolic(?) Pressure before filtering');
 %% Find Minima (Diastolic) (inverted data set)
 % Do the same as with the systolic, however invert the signal in order to
 % find the diastolic minima occurance which now looks like a peak and thus you are able to use findpeaks(). Plot the occurances of the minima on
