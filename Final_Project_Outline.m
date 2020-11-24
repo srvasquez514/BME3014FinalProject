@@ -109,7 +109,7 @@ title('Lowpass Filtered Data')
 % value.
 [peaks,loc,width,~] = findpeaks(lowfilt);
 figure
-plot(lowtime(loc),lowfilt(loc), 'o' , lowtime(1:1016),lowfilt(1:1016)); %Arrays need to be the same size so used 1:1016 to plot peaks.
+plot(lowtime(loc),lowfilt(loc), 'o' , lowtime,lowfilt(1:end-1)); %Arrays need to be the same size so used 1:1016 to plot peaks.
 xlabel('Time(s)')
 ylabel('Pressure (mmHg)')
 title('Peaks of Heart Pressure Waveform')
@@ -138,7 +138,7 @@ width(peak_err) = [];
 % end
 %% Plot Again
 figure
-plot(lowtime(peaks),lowfilt(peaks), 'o' ,lowtime(1:1016),lowfilt(1:1016)); %Arrays need to be the same size so used 1:1016 to plot peaks.
+plot(lowtime(peaks),lowfilt(peaks), 'o' ,lowtime,lowfilt(1:end-1)); %Arrays need to be the same size so used 1:1016 to plot peaks.
 xlabel('Time(s)')
 ylabel('Pressure (mmHg)')
 title('Peaks of Heart Pressure Waveform')
@@ -152,7 +152,7 @@ title('Peaks of Heart Pressure Waveform')
 [peaks_min,loc_min,width_min,~] = findpeaks(-lowfilt);
 peaks_min = abs(peaks_min);
 figure
-plot(lowtime(loc_min),lowfilt(loc_min), 'o', lowtime(1:1016), lowfilt(1:1016));
+plot(lowtime(loc_min),lowfilt(loc_min), 'o', lowtime, lowfilt(1:end-1));
 xlabel('Time (s)')
 ylabel('Pressure (mmHg)')
 title('Diastolic Pressure before filtering');
@@ -169,7 +169,7 @@ peaks_min(peak_err) = [];
 loc_min(peak_err) = [];
 width_min(peak_err) = [];
 figure
-plot(lowtime(loc_min),lowfilt(loc_min), 'o', lowtime(1:1016), lowfilt(1:1016));
+plot(lowtime(loc_min),lowfilt(loc_min), 'o', lowtime, lowfilt(1:end-1));
 xlabel('Time (s)')
 ylabel('Pressure (mmHg)')
 title('Diastolic Pressure after filtering');
