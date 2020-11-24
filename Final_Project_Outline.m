@@ -86,7 +86,7 @@ title('Low Pass Filtered Heart Condition')
 % It takes longer for the CPU to append to a vector than to change a vector
 % value.
 avgdata = mean(filtdata);
-[peaks,loc,width,~] = findpeaks(filtdata);
+[peaks,loc] = findpeaks(filtdata);
 realpeaks = peaks;
 realloc = loc;
 for i = 1: length(realpeaks)
@@ -128,12 +128,25 @@ title('Peaks (Systolic) of Heart Pressure Waveform')
 % Do the same as with the systolic, however invert the signal in order to
 % find the diastolic minima occurance which now looks like a peak and thus you are able to use findpeaks(). Plot the occurances of the minima on
 % the original filtered signal to prove that your threshold is correct.
+avgdata = mean(-filtdata);
+[peaks,loc,width,~] = findpeaks(-filtdata);
+realpeaks = peaks;
+realloc = loc;
+for i = 1: length(realpeaks)
+    if realpeaks(i) < avgdata
+        realpeaks(i) = 0;
+        realloc(i) = 0;
+    end
+end
+ realpeaks(realpeaks==0) = [];
+ realloc(realloc ==0) = []; 
 
 
-[pks1,locs1] = findpeaks(-filtdata);
-disp(locs1)
+% [pks1,locs1] = findpeaks(-filtdata);
+% disp(locs1)
 figure
-plot(time(locs1), filtdata(locs1), 'or', time, filtdata)
+plot(time(realloc),realpeaks, 'o', time,-filtdata(1:length(time))); 
+% plot(time(locs1), filtdata(locs1), 'or', time, filtdata)
 xlabel('Time(s)') 
 ylabel('Pressure (mmHg)')
 title('Minima (Diastolic) of Heart Pressure Waveform')
