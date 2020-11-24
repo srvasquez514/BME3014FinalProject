@@ -112,12 +112,20 @@ title('Lowpass Filtered Data')
 % value.
 avgdata = mean(filtdata);
 [peaks,loc,width,~] = findpeaks(lowfilt);
-
-
+realpeaks = peaks;
+realloc = loc;
+for i = 1: length(realpeaks)
+    if realpeaks(i) < avgdata
+        realpeaks(i) = 0;
+        realloc(i) = 0;
+    end
+end
+ realpeaks(realpeaks==0) = [];
+ realloc(realloc ==0) = [ ]; 
+        
 figure
-%plot(lowtime(peaks),lowfilt(loc), 'o', lowtime,lowfilt(1:end-1)); %Arrays need to be the same size so used 1:1016 to plot peaks.
-plot(lowtime(loc(peaks>avgdata)),lowfilt(peaks), 'o', lowtime,lowfilt(1:end-1));
-xlabel('Time(s)')
+plot(lowtime(realloc),realpeaks, 'o', lowtime,lowfilt(1:length(lowtime)));  %Arrays need to be the same size so used 1:1016 to plot peaks.
+xlabel('Time(s)') 
 ylabel('Pressure (mmHg)')
 title('Peaks of Heart Pressure Waveform')
 %% Applying the filtering
