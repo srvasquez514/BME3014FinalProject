@@ -110,11 +110,13 @@ title('Lowpass Filtered Data')
 % NAMES. Tip - preallocate vectors of zeros to save time and processing power.
 % It takes longer for the CPU to append to a vector than to change a vector
 % value.
-[peaks,loc,width,~] = findpeaks(lowfilt);
 avgdata = mean(filtdata);
+[peaks,loc,width,~] = findpeaks(lowfilt);
+
+
 figure
-%plot(lowtime(loc(peaks>avgdata)),lowfilt(peaks>avgdata), 'o', lowtime,lowfilt(1:end-1)); %Arrays need to be the same size so used 1:1016 to plot peaks.
-plot(lowfilt(peaks>avgdata), 'o', lowtime,lowfilt(1:end-1));
+%plot(lowtime(peaks),lowfilt(loc), 'o', lowtime,lowfilt(1:end-1)); %Arrays need to be the same size so used 1:1016 to plot peaks.
+plot(lowtime(loc(peaks>avgdata)),lowfilt(peaks), 'o', lowtime,lowfilt(1:end-1));
 xlabel('Time(s)')
 ylabel('Pressure (mmHg)')
 title('Peaks of Heart Pressure Waveform')
