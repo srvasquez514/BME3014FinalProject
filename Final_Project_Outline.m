@@ -116,12 +116,14 @@ title('Peaks of Heart Pressure Waveform')
 % plot(lowtime(loc_min),lowfilt(loc_min), 'o', lowtime, lowfilt(1:end-1));
 % xlabel('Time (s)')
 % ylabel('Pressure (mmHg)')
-% 
-figure
+% title('Diastolic Pressure before filtering');
 [pks,locs] = findpeaks(filtdata);
+disp(locs)
 figure
 plot(time(locs), filtdata(locs), 'or', time, filtdata)
-title('Systolic(?) Pressure before filtering');
+xlabel('Time(s)') 
+ylabel('Pressure (mmHg)')
+title('Peaks (Systolic) of Heart Pressure Waveform')
 %% Find Minima (Diastolic) (inverted data set)
 % Do the same as with the systolic, however invert the signal in order to
 % find the diastolic minima occurance which now looks like a peak and thus you are able to use findpeaks(). Plot the occurances of the minima on
@@ -129,8 +131,12 @@ title('Systolic(?) Pressure before filtering');
 
 
 [pks1,locs1] = findpeaks(-filtdata);
+disp(locs1)
 figure
 plot(time(locs1), filtdata(locs1), 'or', time, filtdata)
+xlabel('Time(s)') 
+ylabel('Pressure (mmHg)')
+title('Minima (Diastolic) of Heart Pressure Waveform')
 %% Maximum Developed Pressure
 % % Maximum developed pressure is the mean of the difference between the
 % % systolic and diastolic pressures. However, please remember that you may
@@ -147,21 +153,21 @@ plot(time(locs1), filtdata(locs1), 'or', time, filtdata)
 % % end
 % 
 % 
-% %% Maximum rate of pressure increase 
+%% Maximum rate of pressure increase 
 % % Take the derivative of the filtered signal and find the peaks using the
 % % findpeaks() function once more. Please plot the differentiated signal and
 % % the peaks in order to prove that your are finding the peaks.
 % derivolt=diff(voltage);
 % 
 % 
-% %% Minimum rate of pressure increase
+%% Minimum rate of pressure increase
 % % Do the same as above, however you would apply the findpeaks() function to
 % % the inverted derivative vector to find the minima. Plot the minimum rates
 % % of pressure increase on the derivative graph to show that your threshold
 % % was adequate.
 % 
 % 
-% %% Validation of minima dp/dt and minima
+%% Validation of minima dp/dt and minima
 % % Plot the original filtered signal, but now with where the max and minimum
 % % change in pressures noted. Best way to do so is to take the occurances of
 % % the minima and maxima (which should be samples) and plot it against the
@@ -170,7 +176,7 @@ plot(time(locs1), filtdata(locs1), 'or', time, filtdata)
 % 
 % 
 % 
-% %% Diastolic Time Constant
+%% Diastolic Time Constant
 % % Find the diastolic time constant over a time range as noted in lecture.
 % % Please see the pressureerror and the pressureeqn Matlab functions and
 % % scripts provided by the Professor. Remeber to acount for if the first
@@ -208,10 +214,9 @@ plot(time(locs1), filtdata(locs1), 'or', time, filtdata)
 % 
 % 
 % 
-% %% Final Display of all Parameters to perform t and p tests on 
+%% Final Display of all Parameters to perform t and p tests on 
 % %Finally display your average diastolic and systolic pressures, your
 % %maximum deveoped pressure, your tau, and your maximum and minimum dp/dt
 % %values for the user to see on the command window. And thats it :D
 % 
 % 
-
