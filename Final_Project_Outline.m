@@ -1,6 +1,9 @@
 %% Name and Group Number
 % Names = Azka Siddiq, Claire Nicolas, Sarah Vasquez 
 % GroupNumber = 5
+
+clear all
+close all
 %% Import Data - Azka
 % Please remember that this code must prompt the user for the file name.Use
 % funvtion inputdlg(). Having done so, use the filename input to import
@@ -24,7 +27,6 @@
 %fname=char(prompt);  
 %rawdata=dlmread(fname,',',23,0);
 
-%isHealthy = 1 (if healthy) 2 (if infarcted)
 
 fname = 'Infarct1.csv';
 rawdata = importdata(fname);
@@ -82,20 +84,20 @@ title('Low Pass Filtered Heart Condition Data - 1 Second')
 % ylabel('Pressure (mmHg)')
 % title('Low Pass Filtered Heart Condition Data - 1 Second')
 %% Stop
-if isHealthy == 1  %filter for healthy hearts
-    %filtered = filter(LPH, heartwaveform) Make different lpfilt for <3TYPE
-elseif isHealthy == 2  %filter for infracted hearts 
-    %filtered = filter(LPI, heartwaveform)
-else
-    disp('Invalid Heart State input. Please try again.')
-end
+%  if heartcondition_identifier == 1  %filter for healthy hearts
+%      %filtered = filter(LPH, heartwaveform) Make different lpfilt for <3TYPE
+%  elseif heartcondition_identifier == 2  %filter for infracted hearts 
+%      %filtered = filter(LPI, heartwaveform)
+%  else
+%      disp('Invalid Heart State input. Please try again.')
+%  end
 
 
 %% Plot Filtered Data
 
 timedelay = grpdelay(LP); % find delay associated with low pass filter
 lowfilt = filtdata(timedelay:end); % account for this delay in dataset
-lowtime = time(1:(end-timedelay));
+lowtime = time(1:(end-timedelay));% Time of dataset accounting for time delay form filter
 figure
 plot(lowtime(sample),lowfilt(sample))
 xlabel ('Time(s)')
@@ -109,8 +111,10 @@ title('Lowpass Filtered Data')
 % It takes longer for the CPU to append to a vector than to change a vector
 % value.
 [peaks,loc,width,~] = findpeaks(lowfilt);
+avgdata = mean(filtdata);
 figure
-plot(lowtime(loc),lowfilt(loc), 'o' , lowtime,lowfilt(1:end-1)); %Arrays need to be the same size so used 1:1016 to plot peaks.
+%plot(lowtime(loc(peaks>avgdata)),lowfilt(peaks>avgdata), 'o', lowtime,lowfilt(1:end-1)); %Arrays need to be the same size so used 1:1016 to plot peaks.
+plot(lowfilt(peaks>avgdata), 'o', lowtime,lowfilt(1:end-1));
 xlabel('Time(s)')
 ylabel('Pressure (mmHg)')
 title('Peaks of Heart Pressure Waveform')
@@ -174,86 +178,86 @@ plot(lowtime(loc_min),lowfilt(loc_min), 'o', lowtime, lowfilt(1:end-1));
 xlabel('Time (s)')
 ylabel('Pressure (mmHg)')
 title('Diastolic Pressure after filtering');
-%% Maximum Developed Pressure - Claire
-% Maximum developed pressure is the mean of the difference between the
-% systolic and diastolic pressures. However, please remember that you may
-% have more diastolic points than systolic points depending on when the
-% recording starts during the heart beat! Use an if statement to adjust
-% which systolic pressure to use (first recorded value or second)!
-
-%maxDP = average(systolic - diastolic
-
-% if systolic pressure > level
-%    %maxDP = average(systolic(w/o the first) - diastolic) 
-% else 
-%    %maxDP = average(systolic(w/o the first) - diastolic) 
+% %% Maximum Developed Pressure - Claire
+% % Maximum developed pressure is the mean of the difference between the
+% % systolic and diastolic pressures. However, please remember that you may
+% % have more diastolic points than systolic points depending on when the
+% % recording starts during the heart beat! Use an if statement to adjust
+% % which systolic pressure to use (first recorded value or second)!
+% 
+% %maxDP = average(systolic - diastolic
+% 
+% % if systolic pressure > level
+% %    %maxDP = average(systolic(w/o the first) - diastolic) 
+% % else 
+% %    %maxDP = average(systolic(w/o the first) - diastolic) 
+% % end
+% 
+% 
+% %% Maximum rate of pressure increase 
+% % Take the derivative of the filtered signal and find the peaks using the
+% % findpeaks() function once more. Please plot the differentiated signal and
+% % the peaks in order to prove that your are finding the peaks.
+% derivolt=diff(voltage);
+% 
+% 
+% %% Minimum rate of pressure increase
+% % Do the same as above, however you would apply the findpeaks() function to
+% % the inverted derivative vector to find the minima. Plot the minimum rates
+% % of pressure increase on the derivative graph to show that your threshold
+% % was adequate.
+% 
+% 
+% %% Validation of minima dp/dt and minima
+% % Plot the original filtered signal, but now with where the max and minimum
+% % change in pressures noted. Best way to do so is to take the occurances of
+% % the minima and maxima (which should be samples) and plot it against the
+% % original signal values at those occurances(aka samples).
+% 
+% 
+% 
+% 
+% %% Diastolic Time Constant
+% % Find the diastolic time constant over a time range as noted in lecture.
+% % Please see the pressureerror and the pressureeqn Matlab functions and
+% % scripts provided by the Professor. Remeber to acount for if the first
+% % diastolic value occurs after the first minimum dp/dt value (use an if
+% % loop). Plot to shhow how well the curve fits the original signal (or if
+% % it works at all!) This is the hardest part of the final project, so don't
+% % get discouraged if you have issues in this section.
+% 
+% overalltime = [];
+% overallmag = [];
+% tao_estimate = [];
+% 
+% for i = 1:length(minima)-1
+%  
+%  timex = time(region);
+% overalltime = [overalltime timex'];
+% % Define starting point
+% % [Po,P1,tau]
+% P0 = [1 1 1];
+% % Lower bounds
+% lb = [0 0 .00001];
+% % Upper bounds
+% ub = [Inf Inf Inf];
+% 
+% anonfunc = @(P) pressureerror(P,timex,voltage(region));
+% 
+% %fitted_pressure = pressureeqn(Pest,timex);
+% Pest = fmincon(anonfunc,P0,[],[],[],[],lb,ub);
+% 
+% tao_estimate = [tao_estimate Pest(3)];
+% 
+% fin = pressureeqn(Pest,timex);
+% overallmag = [overallmag fin'];
 % end
-
-
-%% Maximum rate of pressure increase 
-% Take the derivative of the filtered signal and find the peaks using the
-% findpeaks() function once more. Please plot the differentiated signal and
-% the peaks in order to prove that your are finding the peaks.
-derivolt=diff(voltage);
-
-
-%% Minimum rate of pressure increase
-% Do the same as above, however you would apply the findpeaks() function to
-% the inverted derivative vector to find the minima. Plot the minimum rates
-% of pressure increase on the derivative graph to show that your threshold
-% was adequate.
-
-
-%% Validation of minima dp/dt and minima
-% Plot the original filtered signal, but now with where the max and minimum
-% change in pressures noted. Best way to do so is to take the occurances of
-% the minima and maxima (which should be samples) and plot it against the
-% original signal values at those occurances(aka samples).
-
-
-
-
-%% Diastolic Time Constant
-% Find the diastolic time constant over a time range as noted in lecture.
-% Please see the pressureerror and the pressureeqn Matlab functions and
-% scripts provided by the Professor. Remeber to acount for if the first
-% diastolic value occurs after the first minimum dp/dt value (use an if
-% loop). Plot to shhow how well the curve fits the original signal (or if
-% it works at all!) This is the hardest part of the final project, so don't
-% get discouraged if you have issues in this section.
-
-overalltime = [];
-overallmag = [];
-tao_estimate = [];
-
-for i = 1:length(minima)-1
- 
- timex = time(region);
-overalltime = [overalltime timex'];
-% Define starting point
-% [Po,P1,tau]
-P0 = [1 1 1];
-% Lower bounds
-lb = [0 0 .00001];
-% Upper bounds
-ub = [Inf Inf Inf];
-
-anonfunc = @(P) pressureerror(P,timex,voltage(region));
-
-%fitted_pressure = pressureeqn(Pest,timex);
-Pest = fmincon(anonfunc,P0,[],[],[],[],lb,ub);
-
-tao_estimate = [tao_estimate Pest(3)];
-
-fin = pressureeqn(Pest,timex);
-overallmag = [overallmag fin'];
-end
-
-
-
-%% Final Display of all Parameters to perform t and p tests on 
-%Finally display your average diastolic and systolic pressures, your
-%maximum deveoped pressure, your tau, and your maximum and minimum dp/dt
-%values for the user to see on the command window. And thats it :D
-
-
+% 
+% 
+% 
+% %% Final Display of all Parameters to perform t and p tests on 
+% %Finally display your average diastolic and systolic pressures, your
+% %maximum deveoped pressure, your tau, and your maximum and minimum dp/dt
+% %values for the user to see on the command window. And thats it :D
+% 
+% 

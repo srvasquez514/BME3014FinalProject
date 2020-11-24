@@ -1,6 +1,9 @@
 %% Name and Group Number
 % Names = Azka Siddiq, Claire Nicolas, Sarah Vasquez 
 % GroupNumber = 5
+
+clear all
+close all
 %% Import Data - Azka
 % Please remember that this code must prompt the user for the file name.Use
 % funvtion inputdlg(). Having done so, use the filename input to import
@@ -24,7 +27,6 @@
 %fname=char(prompt);  
 %rawdata=dlmread(fname,',',23,0);
 
-%isHealthy = 1 (if healthy) 2 (if infarcted)
 
 fname = 'Infarct1.csv';
 rawdata = importdata(fname);
@@ -82,13 +84,13 @@ title('Low Pass Filtered Heart Condition Data - 1 Second')
 % ylabel('Pressure (mmHg)')
 % title('Low Pass Filtered Heart Condition Data - 1 Second')
 %% Stop
-if isHealthy == 1  %filter for healthy hearts
-    %filtered = filter(LPH, heartwaveform) Make different lpfilt for <3TYPE
-elseif isHealthy == 2  %filter for infracted hearts 
-    %filtered = filter(LPI, heartwaveform)
-else
-    disp('Invalid Heart State input. Please try again.')
-end
+ if heartcondition_identifier == 1  %filter for healthy hearts
+     %filtered = filter(LPH, heartwaveform) Make different lpfilt for <3TYPE
+ elseif heartcondition_identifier == 2  %filter for infracted hearts 
+     %filtered = filter(LPI, heartwaveform)
+ else
+     disp('Invalid Heart State input. Please try again.')
+ end
 
 
 %% Plot Filtered Data
@@ -182,6 +184,12 @@ title('Diastolic Pressure after filtering');
 % which systolic pressure to use (first recorded value or second)!
 
 %maxDP = average(systolic - diastolic
+
+% if systolic pressure > level
+%    %maxDP = average(systolic(w/o the first) - diastolic) 
+% else 
+%    %maxDP = average(systolic(w/o the first) - diastolic) 
+% end
 
 
 %% Maximum rate of pressure increase 
