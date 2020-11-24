@@ -24,6 +24,7 @@
 %fname=char(prompt);  
 %rawdata=dlmread(fname,',',23,0);
 
+%isHealthy = 1 (if healthy) 2 (if infarcted)
 
 fname = 'Infarct1.csv';
 rawdata = importdata(fname);
@@ -81,9 +82,9 @@ title('Low Pass Filtered Heart Condition Data - 1 Second')
 % ylabel('Pressure (mmHg)')
 % title('Low Pass Filtered Heart Condition Data - 1 Second')
 %% Stop
-if heartwaveform == 1  %filter for healthy hearts
+if isHealthy == 1  %filter for healthy hearts
     %filtered = filter(LPH, heartwaveform) Make different lpfilt for <3TYPE
-elseif heartwaveform == 2  %filter for infracted hearts 
+elseif isHealthy == 2  %filter for infracted hearts 
     %filtered = filter(LPI, heartwaveform)
 else
     disp('Invalid Heart State input. Please try again.')
@@ -180,6 +181,13 @@ title('Diastolic Pressure after filtering');
 % recording starts during the heart beat! Use an if statement to adjust
 % which systolic pressure to use (first recorded value or second)!
 
+%maxDP = average(systolic - diastolic
+
+% if systolic pressure > level
+%    %maxDP = average(systolic(w/o the first) - diastolic) 
+% else 
+%    %maxDP = average(systolic(w/o the first) - diastolic) 
+% end
 
 
 %% Maximum rate of pressure increase 

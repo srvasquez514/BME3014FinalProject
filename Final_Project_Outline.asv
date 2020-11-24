@@ -1,6 +1,6 @@
 %% Name and Group Number
-
-%%
+% Names = Azka Siddiq, Claire Nicolas, Sarah Vasquez 
+% GroupNumber = 5
 %% Import Data - Azka
 % Please remember that this code must prompt the user for the file name.Use
 % funvtion inputdlg(). Having done so, use the filename input to import
@@ -16,6 +16,16 @@
 %     fname = sprintf('%s_%s.csv',heartcondition(heartcondition_identifier),num2str(i));
 %     rawdata = importdata(fname,',',23);
 % end
+
+%This code imports the original files and removes the header
+%I'm leaving it commented for now because it's a lot eaasier to run the code and check progress when you don't... 
+    %have to input the file name everytime -AZKA
+%prompt=inputdlg('What is the filename?');
+%fname=char(prompt);  
+%rawdata=dlmread(fname,',',23,0);
+
+%isHealthy = 1 (if healthy) 2 (if infarcted)
+
 fname = 'Infarct1.csv';
 rawdata = importdata(fname);
 time = rawdata.data(:,1);
@@ -72,10 +82,10 @@ title('Low Pass Filtered Heart Condition Data - 1 Second')
 % ylabel('Pressure (mmHg)')
 % title('Low Pass Filtered Heart Condition Data - 1 Second')
 %% Stop
-if heartwaveform == 1
-    %filter for healthy hearts
-elseif heartwaveform == 2
-   %filter for infracted hearts 
+if isHealthy == 1  %filter for healthy hearts
+    %filtered = filter(LPH, heartwaveform) Make different lpfilt for <3TYPE
+elseif isHealthy == 2  %filter for infracted hearts 
+    %filtered = filter(LPI, heartwaveform)
 else
     disp('Invalid Heart State input. Please try again.')
 end
@@ -100,7 +110,7 @@ title('Lowpass Filtered Data')
 % value.
 [peaks,loc,width,~] = findpeaks(lowfilt);
 figure
-plot(lowtime(loc),lowfilt(loc), 'o' , lowtime(1:1016),lowfilt(1:1016)); %Arrays need to be the same size so used 1:1016 to plot peaks.
+plot(lowtime(loc),lowfilt(loc), 'o' , lowtime,lowfilt(1:end-1)); %Arrays need to be the same size so used 1:1016 to plot peaks.
 xlabel('Time(s)')
 ylabel('Pressure (mmHg)')
 title('Peaks of Heart Pressure Waveform')
@@ -129,7 +139,7 @@ width(peak_err) = [];
 % end
 %% Plot Again
 figure
-plot(lowtime(peaks),lowfilt(peaks), 'o' ,lowtime(1:1016),lowfilt(1:1016)); %Arrays need to be the same size so used 1:1016 to plot peaks.
+plot(lowtime(peaks),lowfilt(peaks), 'o' ,lowtime,lowfilt(1:end-1)); %Arrays need to be the same size so used 1:1016 to plot peaks.
 xlabel('Time(s)')
 ylabel('Pressure (mmHg)')
 title('Peaks of Heart Pressure Waveform')
@@ -143,7 +153,7 @@ title('Peaks of Heart Pressure Waveform')
 [peaks_min,loc_min,width_min,~] = findpeaks(-lowfilt);
 peaks_min = abs(peaks_min);
 figure
-plot(lowtime(loc_min),lowfilt(loc_min), 'o', lowtime(1:1016), lowfilt(1:1016));
+plot(lowtime(loc_min),lowfilt(loc_min), 'o', lowtime, lowfilt(1:end-1));
 xlabel('Time (s)')
 ylabel('Pressure (mmHg)')
 title('Diastolic Pressure before filtering');
@@ -160,7 +170,7 @@ peaks_min(peak_err) = [];
 loc_min(peak_err) = [];
 width_min(peak_err) = [];
 figure
-plot(lowtime(loc_min),lowfilt(loc_min), 'o', lowtime(1:1016), lowfilt(1:1016));
+plot(lowtime(loc_min),lowfilt(loc_min), 'o', lowtime, lowfilt(1:end-1));
 xlabel('Time (s)')
 ylabel('Pressure (mmHg)')
 title('Diastolic Pressure after filtering');
@@ -171,6 +181,7 @@ title('Diastolic Pressure after filtering');
 % recording starts during the heart beat! Use an if statement to adjust
 % which systolic pressure to use (first recorded value or second)!
 
+%maxDP = average(systolic - diastolic
 
 
 %% Maximum rate of pressure increase 
