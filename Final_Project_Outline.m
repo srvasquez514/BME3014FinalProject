@@ -85,26 +85,41 @@ title('Low Pass Filtered Heart Condition')
 % NAMES. Tip - preallocate vectors of zeros to save time and processing power.
 % It takes longer for the CPU to append to a vector than to change a vector
 % value.
-avgdata = mean(filtdata);
-[peaks,loc] = findpeaks(filtdata);
-realpeaks = peaks;
-realloc = loc;
-for i = 1: length(realpeaks)
-    if realpeaks(i) < avgdata
-        realpeaks(i) = 0;
-        realloc(i) = 0;
-    end
-end
- realpeaks(realpeaks==0) = [];
- realloc(realloc ==0) = []; 
 
-%% Plot to Observe Local Maxima
+level = 50;
+threshdata = false(size(filtdata));
+thresdata(filtdata > level) = true;
+threshdiff = diff(threshdata);
+
+maximastart = find(threshdiff==1);
+maximaend = find(threshdiff==-1);
+maxpeak = zeros(size(maximastart));
+amp = zeros(size(maximastart));
+
+for i = 1:length(maximastart)
+  [heartmax,curind] = max(filtdata(maximastart(i):maximaend(i)));
+  maxpeak(i) = curind+maximastart(i)-1;
+  [heartmin,~] = min(filtdata(maximastart(i):maximaend(i)));
+  amp(i) = heartmax-heartmin;
+end
+
+peakdata = islocalmax(filtdata);
+maxlocal = find(peakdata);
+lowdata = islocalmin(filtdata);
+minlocal = find(lowdata);
+disp(maxlocal)
+disp(minlocal)
+
+%% Plot of Local Maxima
 figure
-plot(time(realloc),realpeaks, 'o', time,filtdata(1:length(time)));  %Arrays need to be the same size so used 1:1016 to plot peaks.
+plot(time,filtdata, 'or' , time(maximastart:maximaend), filtdata(maximastart:maximaend))
+% plot(time(maximastart:maximaend), filtdata(maximastart:maximaend),'or')
 xlabel('Time(s)') 
 ylabel('Pressure (mmHg)')
-title('Peaks of Heart Pressure Waveform')
+title('Local Maxima of Heart Pressure Waveform')
 
+% figure
+% plot(time,filtdata, 'or', time(peakdata:lowdata), filtdata(peakdata:lowdata))
 %% Find peaks (Systolic)
 % Use the findpeaks() function to find the peaks of the cleaned signal.
 % Plot the peaks over the cleaned signal to prove that your threshold is
@@ -117,21 +132,18 @@ title('Peaks of Heart Pressure Waveform')
 % xlabel('Time (s)')
 % ylabel('Pressure (mmHg)')
 % title('Diastolic Pressure before filtering');
-[pks,locs] = findpeaks(filtdata);
-disp(locs)
-figure
-plot(time(locs), filtdata(locs), 'or', time, filtdata)
-xlabel('Time(s)') 
-ylabel('Pressure (mmHg)')
-title('Peaks (Systolic) of Heart Pressure Waveform')
-%% Find Minima (Diastolic) (inverted data set)
-% Do the same as with the systolic, however invert the signal in order to
-% find the diastolic minima occurance which now looks like a peak and thus you are able to use findpeaks(). Plot the occurances of the minima on
-% the original filtered signal to prove that your threshold is correct.
-avgdata = mean(-filtdata);
-[peaks,loc,width,~] = findpeaks(-filtdata);
-realpeaks = peaks;
-realloc = loc;
+% [pks,locs] = findpeaks(filtdata);
+% disp(locs)
+% figure
+% plot(time(locs), filtdata(locs), 'or', time, filtdata)
+% xlabel('Time(s)') 
+% ylabel('Pressure (mmHg)')
+% title('Peaks (Systolic) of Heart Pressure Waveform')
+
+avgdata = mean(filtdata);
+[peaks,loc] = findpeaks(filtdata);
+realpeaks = (peaks);
+realloc = (loc);
 for i = 1: length(realpeaks)
     if realpeaks(i) < avgdata
         realpeaks(i) = 0;
@@ -141,11 +153,34 @@ end
  realpeaks(realpeaks==0) = [];
  realloc(realloc ==0) = []; 
 
+figure
+plot(time(realloc),realpeaks, 'o', time,filtdata(1:length(time)));  %Arrays need to be the same size so used 1:1016 to plot peaks.
+xlabel('Time(s)') 
+ylabel('Pressure (mmHg)')
+title('Peaks of Heart Pressure Waveform')
+%% Find Minima (Diastolic) (inverted data set)
+% Do the same as with the systolic, however invert the signal in order to
+% find the diastolic minima occurance which now looks like a peak and thus you are able to use findpeaks(). Plot the occurances of the minima on
+% the original filtered signal to prove that your threshold is correct.
+avgdata = mean(-filtdata);
+[peaks1,loc1] = findpeaks(-filtdata,'MinPeakDistance',+50);
+realpeaks1 = (peaks1);
+realloc1 = (loc1);
+for i = 1: length(realpeaks1)
+    if realpeaks1(i) < avgdata
+        realpeaks1(i) = 0;
+        realloc1(i) = 0;
+    end
+end
+ realpeaks1(realpeaks1==0) = [];
+ realloc1(realloc1 ==0) = []; 
 
+minlocal = (realloc1);
+disp(minlocal(1:length(realpeaks1)));
 % [pks1,locs1] = findpeaks(-filtdata);
 % disp(locs1)
 figure
-plot(time(realloc),realpeaks, 'o', time,-filtdata(1:length(time))); 
+plot(time(realloc1),realpeaks1, 'o', time,-filtdata(1:length(time)));  
 % plot(time(locs1), filtdata(locs1), 'or', time, filtdata)
 xlabel('Time(s)') 
 ylabel('Pressure (mmHg)')
