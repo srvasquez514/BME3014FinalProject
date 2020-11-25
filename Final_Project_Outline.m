@@ -153,6 +153,10 @@ end
  realpeaks(realpeaks==0) = [];
  realloc(realloc ==0) = []; 
 
+maxlocations = realloc;
+disp(maxlocations);
+
+%% Plotting the Systolic Pressure
 figure
 plot(time(realloc),realpeaks, 'o', time,filtdata(1:length(time)));  %Arrays need to be the same size so used 1:1016 to plot peaks.
 xlabel('Time(s)') 
@@ -175,55 +179,96 @@ end
  realpeaks1(realpeaks1==0) = [];
  realloc1(realloc1 ==0) = []; 
 
-minlocal = (realloc1);
-disp(minlocal(1:length(realpeaks1)));
-% [pks1,locs1] = findpeaks(-filtdata);
-% disp(locs1)
-figure
+minlocations = realloc1;
+disp(minlocations);
+
+%% Plotting Distolic Pressure Waveform
 plot(time(realloc1),realpeaks1, 'o', time,-filtdata(1:length(time)));  
 % plot(time(locs1), filtdata(locs1), 'or', time, filtdata)
 xlabel('Time(s)') 
 ylabel('Pressure (mmHg)')
 title('Minima (Diastolic) of Heart Pressure Waveform')
 %% Maximum Developed Pressure
-% % Maximum developed pressure is the mean of the difference between the
-% % systolic and diastolic pressures. However, please remember that you may
-% % have more diastolic points than systolic points depending on when the
-% % recording starts during the heart beat! Use an if statement to adjust
-% % which systolic pressure to use (first recorded value or second)!
-% 
-% %maxDP = average(systolic - diastolic
-% 
-% % if systolic pressure > level
-% %    %maxDP = average(systolic(w/o the first) - diastolic) 
-% % else 
-% %    %maxDP = average(systolic(w/o the first) - diastolic) 
-% % end
-% 
-% 
+% Maximum developed pressure is the mean of the difference between the
+% systolic and diastolic pressures. However, please remember that you may
+% have more diastolic points than systolic points depending on when the
+% recording starts during the heart beat! Use an if statement to adjust
+% which systolic pressure to use (first recorded value or second)!
+
+disp(maxlocations);
+disp(minlocations);
+%maxDP = average(systolic - diastolic)
+
+if maxlocations > 10
+  maxDP = mean((filtdata(maxlocations)-filtdata(minlocations))); 
+else 
+   maxDP = mean((filtdata(maxlocations)-filtdata(minlocations-1))); 
+end
+
+disp(maxDP);
+% maxDP = mean((filtdata(maxlocations)-filtdata(minlocations)));
+
 %% Maximum rate of pressure increase 
-% % Take the derivative of the filtered signal and find the peaks using the
-% % findpeaks() function once more. Please plot the differentiated signal and
-% % the peaks in order to prove that your are finding the peaks.
-% derivolt=diff(voltage);
-% 
-% 
+% Take the derivative of the filtered signal and find the peaks using the
+% findpeaks() function once more. Please plot the differentiated signal and
+% the peaks in order to prove that your are finding the peaks.
+
+derivolt=diff(filtdata);
+level = 5;
+[peaks3,loc3] = findpeaks(derivolt);
+realpeaks3 = (peaks3);
+realloc3 = (loc3);
+for i = 1: length(realpeaks3)
+    if realpeaks3(i) < level
+        realpeaks3(i) = 0;
+        realloc3(i) = 0;
+    end
+end
+ realpeaks3(realpeaks3==0) = [];
+ realloc3(realloc3 ==0) = []; 
+ 
+plot(time(realloc3),realpeaks3, 'o', time(1:1021),derivolt(1:1021));  
+% plot(time(locs1), filtdata(locs1), 'or', time, filtdata)
+xlabel('Time(s)') 
+ylabel('Pressure (mmHg)')
+title('Max Pressure Peaks of Heart Pressure Waveform')
 %% Minimum rate of pressure increase
-% % Do the same as above, however you would apply the findpeaks() function to
-% % the inverted derivative vector to find the minima. Plot the minimum rates
-% % of pressure increase on the derivative graph to show that your threshold
-% % was adequate.
-% 
-% 
+% Do the same as above, however you would apply the findpeaks() function to
+% the inverted derivative vector to find the minima. Plot the minimum rates
+% of pressure increase on the derivative graph to show that your threshold
+% was adequate.
+
+derivolt=diff(filtdata);
+level = 5;
+[peaks4,loc4] = findpeaks(-derivolt);
+realpeaks4 = (peaks4);
+realloc4 = (loc4);
+for i = 1: length(realpeaks4)
+    if realpeaks4(i) < level
+        realpeaks4(i) = 0;
+        realloc4(i) = 0;
+    end
+end
+ realpeaks4(realpeaks4==0) = [];
+ realloc4(realloc4 ==0) = []; 
+ 
+plot(time(realloc4),realpeaks4, 'o', time(1:1021),-derivolt(1:1021));  
+% plot(time(locs1), filtdata(locs1), 'or', time, filtdata)
+xlabel('Time(s)') 
+ylabel('Pressure (mmHg)')
+title('Min Pressure Peaks of Heart Pressure Waveform')
 %% Validation of minima dp/dt and minima
-% % Plot the original filtered signal, but now with where the max and minimum
-% % change in pressures noted. Best way to do so is to take the occurances of
-% % the minima and maxima (which should be samples) and plot it against the
-% % original signal values at those occurances(aka samples).
-% 
-% 
-% 
-% 
+% Plot the original filtered signal, but now with where the max and minimum
+% change in pressures noted. Best way to do so is to take the occurances of
+% the minima and maxima (which should be samples) and plot it against the
+% original signal values at those occurances(aka samples).
+
+figure
+plot(time,filtdata)
+hold on
+plot(time(realloc3),realpeaks3, 'or')
+plot(time(realloc4),realpeaks4, 'bo')
+
 %% Diastolic Time Constant
 % % Find the diastolic time constant over a time range as noted in lecture.
 % % Please see the pressureerror and the pressureeqn Matlab functions and
