@@ -168,22 +168,21 @@ title('Peaks of Heart Pressure Waveform')
 % the original filtered signal to prove that your threshold is correct.
 avgdata = mean(-filtdata);
 [peaks1,loc1] = findpeaks(-filtdata,'MinPeakDistance',+50);
-realpeaks1 = (peaks1);
-realloc1 = (loc1);
-for i = 1: length(realpeaks1)
-    if realpeaks1(i) < avgdata
-        realpeaks1(i) = 0;
-        realloc1(i) = 0;
+for i = 1: length(peaks1)
+    if peaks1(i) < avgdata
+        peaks1(i) = 0;
+        loc1(i) = 0;
     end
 end
- realpeaks1(realpeaks1==0) = [];
- realloc1(realloc1 ==0) = []; 
+ peaks1(peaks1==0) = [];
+ loc1(loc1 ==0) = []; 
 
-minlocations = realloc1;
+minlocations = loc1;
 disp(minlocations);
 
 %% Plotting Distolic Pressure Waveform
-plot(time(realloc1),realpeaks1, 'o', time,-filtdata(1:length(time)));  
+figure
+plot(time(loc1),peaks1, 'o', time,-filtdata(1:length(time)));  
 % plot(time(locs1), filtdata(locs1), 'or', time, filtdata)
 xlabel('Time(s)') 
 ylabel('Pressure (mmHg)')
@@ -199,10 +198,10 @@ disp(maxlocations);
 disp(minlocations);
 %maxDP = average(systolic - diastolic)
 
-if maxlocations > 10
+if length(maxlocations) <= length(minlocations)
   maxDP = mean((filtdata(maxlocations)-filtdata(minlocations))); 
 else 
-   maxDP = mean((filtdata(maxlocations)-filtdata(minlocations-1))); 
+   maxDP = mean((filtdata(maxlocations)-filtdata(minlocations(2:end)))); 
 end
 
 disp(maxDP);
@@ -216,18 +215,16 @@ disp(maxDP);
 derivolt=diff(filtdata);
 level = 5;
 [peaks3,loc3] = findpeaks(derivolt);
-realpeaks3 = (peaks3);
-realloc3 = (loc3);
-for i = 1: length(realpeaks3)
-    if realpeaks3(i) < level
-        realpeaks3(i) = 0;
-        realloc3(i) = 0;
+for i = 1: length(peaks3)
+    if peaks3(i) < level
+        peaks3(i) = 0;
+        loc3(i) = 0;
     end
 end
- realpeaks3(realpeaks3==0) = [];
- realloc3(realloc3 ==0) = []; 
+ peaks3(peaks3==0) = [];
+ loc3(loc3 ==0) = []; 
  
-plot(time(realloc3),realpeaks3, 'o', time(1:1021),derivolt(1:1021));  
+plot(time(loc3),peaks3, 'o', time(length(derivolt)),derivolt);  
 % plot(time(locs1), filtdata(locs1), 'or', time, filtdata)
 xlabel('Time(s)') 
 ylabel('Pressure (mmHg)')
@@ -241,18 +238,16 @@ title('Max Pressure Peaks of Heart Pressure Waveform')
 derivolt=diff(filtdata);
 level = 5;
 [peaks4,loc4] = findpeaks(-derivolt);
-realpeaks4 = (peaks4);
-realloc4 = (loc4);
-for i = 1: length(realpeaks4)
-    if realpeaks4(i) < level
-        realpeaks4(i) = 0;
-        realloc4(i) = 0;
+for i = 1: length(peaks4)
+    if peaks4(i) < level
+        peaks4(i) = 0;
+        loc4(i) = 0;
     end
 end
- realpeaks4(realpeaks4==0) = [];
- realloc4(realloc4 ==0) = []; 
+ peaks4(peaks4==0) = [];
+ loc4(loc4 ==0) = []; 
  
-plot(time(realloc4),realpeaks4, 'o', time(1:1021),-derivolt(1:1021));  
+plot(time(loc4),peaks4, 'o', time(length(-derivolt)),-derivolt);  
 % plot(time(locs1), filtdata(locs1), 'or', time, filtdata)
 xlabel('Time(s)') 
 ylabel('Pressure (mmHg)')
@@ -266,8 +261,8 @@ title('Min Pressure Peaks of Heart Pressure Waveform')
 figure
 plot(time,filtdata)
 hold on
-plot(time(realloc3),realpeaks3, 'or')
-plot(time(realloc4),realpeaks4, 'bo')
+plot(time(loc3),peaks3, 'or')
+plot(time(loc4),peaks4, 'bo')
 
 %% Diastolic Time Constant
 % % Find the diastolic time constant over a time range as noted in lecture.
