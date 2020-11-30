@@ -20,7 +20,7 @@ close all
 %rawdata=dlmread(fname,',',23,0);
 
 
-fname = 'Sham1.csv';
+fname = 'Infarct1.csv';
 rawdata = importdata(fname);
 time = rawdata.data(:,1);
 heartwaveform = rawdata.data(:,2);
@@ -54,12 +54,12 @@ title('Raw Unfiltered Heart Condition Data')
 isHealthy = 1;
 if isHealthy == 1  %filter for healthy hearts
     LP = designfilt('lowpassfir','PassbandFrequency',10,...
-    'StopbandFrequency',60,'StopbandAttenuation',65,'SampleRate',250);
+    'StopbandFrequency',60,'StopbandAttenuation',65,'SampleRate',Fs);
     filtdata = filter(LP,heartwaveform);
     %filtered = filter(LPH, heartwaveform) Make different lpfilt for <3TYPE
 elseif isHealthy == 2  %filter for infracted hearts 
       LP = designfilt('lowpassfir','PassbandFrequency',10,...
-    'StopbandFrequency',60,'StopbandAttenuation',65,'SampleRate',250);
+    'StopbandFrequency',60,'StopbandAttenuation',65,'SampleRate',Fs);
     filtdata = filter(LP,heartwaveform); %filtered = filter(LPI, heartwaveform)
 else
     disp('Invalid Heart State input. Please try again.')
@@ -86,7 +86,7 @@ title('Low Pass Filtered Heart Condition')
 % It takes longer for the CPU to append to a vector than to change a vector
 % value.
 
-level = 80;
+level = 50;
 threshdata = false(size(filtdata));
 thresdata(filtdata > level) = true;
 threshdiff = diff(threshdata);
@@ -111,16 +111,16 @@ disp(maxlocal)
 disp(minlocal)
 
 %% Plot of Local Maxima
-hold on
+% hold on
 % plot(time(peakdata),filtdata(peakdata), 'or')
 % plot(time(lowdata), filtdata(lowdata),'or')
-plot(time(maxlocal),filtdata(maxlocal), 'or')
-plot(time(minlocal), filtdata(minlocal),'or')
-
+% plot(time(maxlocal),filtdata(maxlocal), 'or')
+% plot(time(minlocal), filtdata(minlocal),'or')
+% % figure
 % plot(time(maximastart:maximaend), filtdata(maximastart:maximaend),'or')
-xlabel('Time(s)') 
-ylabel('Pressure (mmHg)')
-title('Local Maxima of Heart Pressure Waveform')
+% xlabel('Time(s)') 
+% ylabel('Pressure (mmHg)')
+% title('Local Maxima of Heart Pressure Waveform')
 
 % figure
 % plot(time,filtdata, 'or', time(peakdata:lowdata), filtdata(peakdata:lowdata))
@@ -149,12 +149,12 @@ end
 maxlocations = realloc;
 disp(maxlocations);
 
-%% Plotting the Systolic Pressure
-figure
-plot(time(realloc),realpeaks, 'o', time,filtdata(1:length(time)));  %Arrays need to be the same size so used 1:1016 to plot peaks.
-xlabel('Time(s)') 
-ylabel('Pressure (mmHg)')
-title('Peaks of Heart Pressure Waveform')
+% %% Plotting the Systolic Pressure
+% figure
+% plot(time(realloc),realpeaks, 'o', time,filtdata(1:length(time)));  %Arrays need to be the same size so used 1:1016 to plot peaks.
+% xlabel('Time(s)') 
+% ylabel('Pressure (mmHg)')
+% title('Peaks of Heart Pressure Waveform')
 %% Find Minima (Diastolic) (inverted data set)
 % Do the same as with the systolic, however invert the signal in order to
 % find the diastolic minima occurance which now looks like a peak and thus you are able to use findpeaks(). Plot the occurances of the minima on
@@ -175,12 +175,12 @@ end
 minlocations = realloc1;
 disp(minlocations);
 
-%% Plotting Distolic Pressure Waveform
-plot(time(realloc1),realpeaks1, 'o', time,-filtdata(1:length(time)));  
-% plot(time(locs1), filtdata(locs1), 'or', time, filtdata)
-xlabel('Time(s)') 
-ylabel('Pressure (mmHg)')
-title('Minima (Diastolic) of Heart Pressure Waveform')
+% %% Plotting Distolic Pressure Waveform
+% plot(time(realloc1),realpeaks1, 'o', time,-filtdata(1:length(time)));  
+% % plot(time(locs1), filtdata(locs1), 'or', time, filtdata)
+% xlabel('Time(s)') 
+% ylabel('Pressure (mmHg)')
+% title('Minima (Diastolic) of Heart Pressure Waveform')
 %% Maximum Developed Pressure
 % Maximum developed pressure is the mean of the difference between the
 % systolic and diastolic pressures. However, please remember that you may
@@ -207,38 +207,38 @@ disp(maxDP);
 % the peaks in order to prove that your are finding the peaks.
 
 derivolt=diff(filtdata);
-avgdata = mean(derivolt);
-level = 1;
+% avgdata = mean(derivolt);
+level = 5;
 [peaks3,loc3] = findpeaks(derivolt);
-% realpeaks3 = (peaks3);
-% realloc3 = (loc3);
-for i = 1: length(peaks3)
-    if peaks3(i) < level
-        peaks3(i) = 0;
-        loc3(i) = 0;
+realpeaks3 = (peaks3);
+realloc3 = (loc3);
+for i = 1:length(peaks3)
+    if realpeaks3(i) < level
+        realpeaks3(i) = 0;
+        realloc3(i) = 0;
     end
 end
-peaks3(peaks3==0) = [];
-loc3(loc3 ==0) = []; 
+realpeaks3(realpeaks3==0) = [];
+realloc3(realloc3 ==0) = []; 
  
-plot(time(loc3),peaks3, 'o', time(length(derivolt)),derivolt);  
-% plot(time(locs1), filtdata(locs1), 'or', time, filtdata)
-xlabel('Time(s)') 
-ylabel('Pressure (mmHg)')
-title('Max Pressure Peaks of Heart Pressure Waveform')
+% plot(time(loc3),peaks3, 'o', time(length(derivolt)),derivolt);  
+% % plot(time(locs1), filtdata(locs1), 'or', time, filtdata)
+% xlabel('Time(s)') 
+% ylabel('Pressure (mmHg)')
+% title('Max Pressure Peaks of Heart Pressure Waveform')
 %% Minimum rate of pressure increase
 % Do the same as above, however you would apply the findpeaks() function to
 % the inverted derivative vector to find the minima. Plot the minimum rates
 % of pressure increase on the derivative graph to show that your threshold
 % was adequate.
 
-derivolt= diff(filtdata);
+derivolt= diff(-filtdata);
 % avgdata = mean(-derivolt);
-level = 1;
-[peaks4,loc4] = findpeaks(-derivolt);
+level = 5;
+[peaks4,loc4] = findpeaks(derivolt);
 % realpeaks = (peaks);
 % realloc = (loc);
-for i = 1: length(peaks4)
+for i = 1: length(-peaks4)
     if peaks4(i) < level
         peaks4(i) = 0;
        loc4(i) = 0;
@@ -247,11 +247,11 @@ end
 peaks4(peaks4==0) = [];
 loc4(loc4 ==0) = []; 
  
-plot(time(loc4),peaks4, 'o', time(1:end-1),-derivolt);  
-% plot(time(locs1), filtdata(locs1), 'or', time, filtdata)
-xlabel('Time(s)') 
-ylabel('Pressure (mmHg)')
-title('Min Pressure Peaks of Heart Pressure Waveform')
+% plot(time(loc4),peaks4, 'o', time(1:end-1),-derivolt);  
+% % plot(time(locs1), filtdata(locs1), 'or', time, filtdata)
+% xlabel('Time(s)') 
+% ylabel('Pressure (mmHg)')
+% title('Min Pressure Peaks of Heart Pressure Waveform')
 %% Validation of minima dp/dt and minima
 % Plot the original filtered signal, but now with where the max and minimum
 % change in pressures noted. Best way to do so is to take the occurances of
@@ -261,7 +261,7 @@ title('Min Pressure Peaks of Heart Pressure Waveform')
 figure
 plot(time,filtdata)
 hold on
-plot(time(loc3),peaks3, 'or')
+plot(time(realloc3),realpeaks3, 'o')
 plot(time(loc4),peaks4, 'bo')
 
 %% Diastolic Time Constant
@@ -397,7 +397,7 @@ title('Peaks of Heart Pressure Waveform')
 % find the diastolic minima occurance which now looks like a peak and thus you are able to use findpeaks(). Plot the occurances of the minima on
 % the original filtered signal to prove that your threshold is correct.
 avgdata = mean(-filtdata);
-[peaks1,loc1] = findpeaks(-filtdata,'MinPeakDistance',+50);
+[peaks1,loc1] = findpeaks(-filtdata,'MinPeakDistance',+50); %+50 is better for infarcted data and +25 is better for Sham data
 for i = 1: length(peaks1)
     if peaks1(i) < avgdata
         peaks1(i) = 0;
