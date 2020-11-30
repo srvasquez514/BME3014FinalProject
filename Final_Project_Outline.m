@@ -321,8 +321,8 @@ threshdata = false(size(filtdata));
 thresdata(filtdata > level) = true;
 threshdiff = diff(threshdata);
 
-maximastart = find(threshdiff==1);
-maximaend = find(threshdiff==-1);
+maximastart = threshdiff(threshdiff==1); %
+maximaend = threshdiff(threshdiff==-1);
 maxpeak = zeros(size(maximastart));
 amp = zeros(size(maximastart));
 
