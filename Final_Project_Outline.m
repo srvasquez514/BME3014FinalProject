@@ -220,7 +220,13 @@ for i = 1:length(peaks3)
 end
 realpeaks3(realpeaks3==0) = [];
 realloc3(realloc3 ==0) = []; 
- 
+
+derivolt=diff(filtdata);
+i = 1;
+for value = 1:length(realpeaks3)
+    realpeaks3Index(i) = find(derivolt == realpeaks3(value));
+    i = i+1;
+end
 % plot(time(loc3),peaks3, 'o', time(length(derivolt)),derivolt);  
 % % plot(time(locs1), filtdata(locs1), 'or', time, filtdata)
 % xlabel('Time(s)') 
@@ -246,7 +252,12 @@ for i = 1: length(-peaks4)
 end
 peaks4(peaks4==0) = [];
 loc4(loc4 ==0) = []; 
- 
+ derivolt=diff(-filtdata);
+i = 1;
+for value = 1:length(peaks4)
+    peaks4Index(i) = find(derivolt == peaks4(value));
+    i = i+1;
+end
 % plot(time(loc4),peaks4, 'o', time(1:end-1),-derivolt);  
 % % plot(time(locs1), filtdata(locs1), 'or', time, filtdata)
 % xlabel('Time(s)') 
@@ -257,13 +268,18 @@ loc4(loc4 ==0) = [];
 % change in pressures noted. Best way to do so is to take the occurances of
 % the minima and maxima (which should be samples) and plot it against the
 % original signal values at those occurances(aka samples).
+% 
+% figure
+% plot(time,filtdata)
+% hold on
+% plot(time(realloc3),realpeaks3, 'o')
+% plot(time(loc4),peaks4, 'bo')
 
 figure
 plot(time,filtdata)
 hold on
-plot(time(realloc3),realpeaks3, 'o')
-plot(time(loc4),peaks4, 'bo')
-
+plot(time(realloc3),filtdata(realpeaks3Index), 'o')
+plot(time(loc4),filtdata(peaks4Index), 'bo')
 %% Diastolic Time Constant
 % % Find the diastolic time constant over a time range as noted in lecture.
 % % Please see the pressureerror and the pressureeqn Matlab functions and
