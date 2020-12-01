@@ -15,9 +15,12 @@ close all
 %This code imports the original files and removes the header
 %I'm leaving it commented for now because it's a lot eaasier to run the code and check progress when you don't... 
     %have to input the file name everytime -AZKA
-%prompt=inputdlg('What is the filename?');
-%fname=char(prompt);  
-%rawdata=dlmread(fname,',',23,0);
+% prompt=inputdlg('What is the filename?');
+% fname=char(prompt);  
+% rawdata=dlmread(fname,',',23,0);
+% list={'Healthy','Infarcted'};
+% isHealthy=listdlg('PromptString', {'What type of heart is the data from?'},...
+%     'SelectionMode','single','ListString',list);
 
 
 fname = 'Infarct1.csv';
