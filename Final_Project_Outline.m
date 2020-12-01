@@ -160,7 +160,11 @@ disp(maxlocations);
 % find the diastolic minima occurance which now looks like a peak and thus you are able to use findpeaks(). Plot the occurances of the minima on
 % the original filtered signal to prove that your threshold is correct.
 avgdata = mean(-filtdata);
-[peaks1,loc1] = findpeaks(-filtdata,'MinPeakDistance',+50);
+if isHealthy == 1
+    [peaks1,loc1] = findpeaks(-filtdata,'MinPeakDistance',+50);
+elseif isHealthy ==2
+    [peaks1,loc1] = findpeaks(-filtdata,'MinPeakDistance',+25);
+end
 realpeaks1 = (peaks1);
 realloc1 = (loc1);
 for i = 1: length(realpeaks1)
