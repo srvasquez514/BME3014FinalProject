@@ -285,8 +285,8 @@ end
 figure
 plot(time,filtdata)
 hold on
-plot(time(realloc3),filtdata(realpeaks3Index), 'o')
-plot(time(loc4),filtdata(peaks4Index), 'bo')
+plot(time(realloc3),filtdata(realpeaks3Index), 'o') %the max dp/dt
+plot(time(loc4),filtdata(peaks4Index), 'bo')   %the min dp/dt
 %% Diastolic Time Constant
 % % Find the diastolic time constant over a time range as noted in lecture.
 % % Please see the pressureerror and the pressureeqn Matlab functions and
@@ -295,7 +295,10 @@ plot(time(loc4),filtdata(peaks4Index), 'bo')
 % % loop). Plot to shhow how well the curve fits the original signal (or if
 % % it works at all!) This is the hardest part of the final project, so don't
 % % get discouraged if you have issues in this section.
-% 
+
+if shit < peaks4Index(1)
+    
+
 % overalltime = [];
 % overallmag = [];
 % tao_estimate = [];
@@ -323,6 +326,7 @@ plot(time(loc4),filtdata(peaks4Index), 'bo')
 % overallmag = [overallmag fin'];
 % end
 % 
+%%%plot overall time and overall mag outside of loop 
 % 
 % 
 %% Final Display of all Parameters to perform t and p tests on 
@@ -525,33 +529,36 @@ plot(time(loc4),peaks4, 'bo')
 % % loop). Plot to shhow how well the curve fits the original signal (or if
 % % it works at all!) This is the hardest part of the final project, so don't
 % % get discouraged if you have issues in this section.
+
+if minlocation(1) < find( 
+
 % 
-% overalltime = [];
-% overallmag = [];
-% tao_estimate = [];
-% 
-% for i = 1:length(minima)-1
-%  
-%  timex = time(region);
-% overalltime = [overalltime timex'];
-% % Define starting point
-% % [Po,P1,tau]
-% P0 = [1 1 1];
-% % Lower bounds
-% lb = [0 0 .00001];
-% % Upper bounds
-% ub = [Inf Inf Inf];
-% 
-% anonfunc = @(P) pressureerror(P,timex,voltage(region));
-% 
-% %fitted_pressure = pressureeqn(Pest,timex);
-% Pest = fmincon(anonfunc,P0,[],[],[],[],lb,ub);
-% 
-% tao_estimate = [tao_estimate Pest(3)];
-% 
-% fin = pressureeqn(Pest,timex);
-% overallmag = [overallmag fin'];
-% end
+overalltime = [];
+overallmag = [];
+tao_estimate = [];
+
+for i = 1:length(minima)-1
+ 
+ timex = time(region);  %%SUPER COMPLICATED
+overalltime = [overalltime timex'];  %%SJ: ADD A NaN at the end
+% Define starting point
+% [Po,P1,tau]
+P0 = [1 1 1];
+% Lower bounds
+lb = [0 0 .00001];
+% Upper bounds
+ub = [Inf Inf Inf];
+
+anonfunc = @(P) pressureerror(P,timex,voltage(region));
+
+%fitted_pressure = pressureeqn(Pest,timex);
+Pest = fmincon(anonfunc,P0,[],[],[],[],lb,ub);
+
+tao_estimate = [tao_estimate Pest(3)];
+
+fin = pressureeqn(Pest,timex);
+overallmag = [overallmag fin']; %%SJ: ADD A NaN at the end
+end
 % 
 % 
 % 
