@@ -270,7 +270,7 @@ end
 % xlabel('Time(s)') 
 % ylabel('Pressure (mmHg)')
 % title('Min Pressure Peaks of Heart Pressure Waveform')
-%% Validation of minima dp/dt and minima
+%% Validation of maxima dp/dt and minima
 % Plot the original filtered signal, but now with where the max and minimum
 % change in pressures noted. Best way to do so is to take the occurances of
 % the minima and maxima (which should be samples) and plot it against the
@@ -296,7 +296,12 @@ plot(time(loc4),filtdata(peaks4Index), 'bo')   %the min dp/dt
 % % it works at all!) This is the hardest part of the final project, so don't
 % % get discouraged if you have issues in this section.
 
-if shit < peaks4Index(1)
+if  minlocations(1) <= peaks4Index(1)
+    diastVal = minlocations(2);
+elseif minlocations(1) > peaks4Index(1)
+    diastVal = minlocations(1);
+end
+    
     
 
 % overalltime = [];
