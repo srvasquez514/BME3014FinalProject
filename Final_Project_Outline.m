@@ -14,16 +14,17 @@ close all
 %This code imports the original files and removes the header
 %I'm leaving it commented for now because it's a lot eaasier to run the code and check progress when you don't... 
     %have to input the file name everytime -AZKA
-% prompt=inputdlg('What is the filename?');
-% fname=char(prompt);  
-% rawdata=dlmread(fname,',',23,0);
-% list={'Healthy','Infarcted'};
-% isHealthy=listdlg('PromptString', {'What type of heart is the data from?'},...
-%     'SelectionMode','single','ListString',list);
-fname = 'Sham1.csv';
-rawdata = importdata(fname);
-time = rawdata.data(:,1);
-heartwaveform = rawdata.data(:,2);
+prompt=inputdlg('What is the filename?');
+fname=char(prompt);  
+rawdata=dlmread(fname,',',23,0);
+list={'Healthy','Infarcted'};
+isHealthy=listdlg('PromptString', {'What type of heart is the data from?'},...
+    'SelectionMode','single','ListString',list);
+rawdata
+%fname = 'Sham1.csv';
+rawdata2 = importdata(fname);
+time = rawdata(:,1);
+heartwaveform = rawdata(:,2);
 %% Set sampling frequency
 Fs = 250; % Hz
 %% Design and Apply Low-Pass Filter to Raw Data Set
@@ -41,7 +42,7 @@ xlabel('Time (Seconds)')
 ylabel('Pressure (mmHg)')
 title('Raw Unfiltered Heart Condition Data')
 %% Stop
-isHealthy = 1; %%Delete at the very end****
+%isHealthy = 1; %%Delete at the very end****
 if isHealthy == 1  %filter for healthy hearts
     LP = designfilt('lowpassfir','PassbandFrequency',10,...
     'StopbandFrequency',60,'StopbandAttenuation',65,'SampleRate',Fs);
@@ -255,7 +256,7 @@ overallmag = [];
 tao_estimate = [];
 i = 1;
 if diastolicloc(i) < Pminloc(i)
-diastolicloc(i) = diastolicloc(2:end);
+diastolicloc = diastolicloc(2:end);
 end
 minima = diastolicpeaks;
 voltage = filtdata;
