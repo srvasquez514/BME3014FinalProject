@@ -171,9 +171,9 @@ disp(minlocations);
 %maxDP = average(systolic - diastolic)
 
 if maxlocations > 10
-  maxDP = mean((filtdata(maxlocations)-filtdata(minlocations(1)))); 
+  maxDP = mean((filtdata(maxlocations(1))-filtdata(minlocations))); 
 else 
-   maxDP = mean((filtdata(maxlocations)-filtdata((minlocations(2))))); 
+   maxDP = mean((filtdata(maxlocations(2))-filtdata((minlocations)))); 
 end
 
 %% Maximum rate of pressure increase 
@@ -261,7 +261,15 @@ end
 minima = diastolicpeaks;
 voltage = filtdata;
 for i = 1:length(minima)-1
-region = (Pminloc(i):diastolicloc(i));
+    if Pminloc(i) < diastolicloc(i)
+        region = (Pminloc(i): diastolicloc(i));
+    elseif Pminloc(i) > diastolicloc(i)
+        region = (diastolicloc(i): Pminloc(i));
+    elseif Pminloc(i) == 0 || diastolicloc(i) == 0
+      Pminloc(i) = [ ] ;
+      diastolicloc(i) = [ ];
+    end
+%region = (Pminloc(i): diastolicloc(i));
  timex = time(region);
 overalltime = [overalltime timex' NaN];
 % Define starting point
