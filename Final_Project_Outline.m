@@ -20,7 +20,7 @@ rawdata=dlmread(fname,',',23,0);
 list={'Healthy','Infarcted'};
 isHealthy=listdlg('PromptString', {'What type of heart is the data from?'},...
     'SelectionMode','single','ListString',list);
-rawdata
+% rawdata
 %fname = 'Sham1.csv';
 rawdata2 = importdata(fname);
 time = rawdata(:,1);
@@ -44,12 +44,12 @@ title('Raw Unfiltered Heart Condition Data')
 %% Stop
 %isHealthy = 1; %%Delete at the very end****
 if isHealthy == 1  %filter for healthy hearts
-    LP = designfilt('lowpassfir','PassbandFrequency',10,...
-    'StopbandFrequency',60,'StopbandAttenuation',65,'SampleRate',Fs);
+    LP = designfilt('lowpassfir','PassbandFrequency',8,...
+    'StopbandFrequency',40,'StopbandAttenuation',60,'SampleRate',Fs);
     filtdata = filter(LP,heartwaveform);
 elseif isHealthy == 2  %filter for infracted hearts 
-      LP = designfilt('lowpassfir','PassbandFrequency',15,...
-    'StopbandFrequency',60,'StopbandAttenuation',65,'SampleRate',Fs);
+      LP = designfilt('lowpassfir','PassbandFrequency',12,...
+    'StopbandFrequency',60,'StopbandAttenuation',70,'SampleRate',Fs);
     filtdata = filter(LP,heartwaveform); 
 else
     disp('Invalid Heart State input. Please try again.')
@@ -89,6 +89,10 @@ peakdata = islocalmax(filtdata);
 maxlocal = find(peakdata);
 disp(maxlocal)
 
+maximumvalues = [];
+for i = 1:length(maxlocal)
+    maximumvalues(i) = filtdata(maxlocal(i));
+end
 figure
 plot(delaytime,filtdata, 'b-')
 hold on
@@ -134,23 +138,51 @@ title('Systolic Peaks of Heart Pressure Waveform')
 
 if isHealthy == 1
     [peaks1,loc1] = findpeaks(-filtdata,'MinPeakDistance',+25); %Sham Data
-elseif isHealthy ==2
-    [peaks1,loc1] = findpeaks(-filtdata,'MinPeakDistance',+50);
+elseif strcmp( fname, 'Infarct 1.csv')
+     [peaks1,loc1] = findpeaks(-filtdata,'MinPeakDistance',+55);
+elseif isHealthy == 2
+    [peaks1,loc1] = findpeaks(-filtdata,'MinPeakDistance',+30);
+ %55 for Infarct 1 and 30 for the rest of Infarct data
 end
 
-avgdata = mean(-filtdata);
-diastolicpeaks = (peaks1);
-diastolicloc = (loc1);
-for i = 1: length(diastolicpeaks)
-    if diastolicpeaks(i) < avgdata
-        diastolicpeaks(i) = 0;
-        diastolicloc(i) = 0;
+    
+
+% diastoliclocmax = islocalmax(loc1);
+% diastolicpeaksmax = islocalmax(peaks1);
+% avgdata = mean(-filtdata);
+% diastolicpeaks = (peaks1);
+% diastolicloc = (loc1);
+% for i = 1: length(diastolicloc)
+%     if diastolicpeaks(i) < avgdata
+%         diastolicpeaks(i) = 0;
+%         diastolicloc(i) = 0;
+%     end
+% end
+%  diastolicpeaks(diastolicpeaks==0) = [];
+%  diastolicloc(diastolicloc ==0) = []; 
+
+diastolicloc = []; 
+diastolicpeaks = [];
+level = mean(-filtdata);
+k = 1;
+for i = 1:length(loc1)
+    if peaks1(i)<level
+        continue
+    else
+        diastolicloc(k) = loc1(i);
+        diastolicpeaks(k) = peaks1(i);
+        k = k+1;
     end
 end
- diastolicpeaks(diastolicpeaks==0) = [];
- diastolicloc(diastolicloc ==0) = []; 
 
-minlocations = diastolicloc;
+peakdata = islocalmax(-filtdata);
+maxlocal = find(peakdata);
+disp(maxlocal)
+ minvalues = [];
+for i = 1:length(maxlocal)
+    minvalues(i) = -filtdata(maxlocal(i));
+end
+ minlocations = diastolicloc;
 disp(minlocations);
 %% Plotting Distolic Pressure Waveform
 figure
@@ -250,7 +282,39 @@ title('dp/dt of Heart Pressure Waveform')
 % % loop). Plot to show how well the curve fits the original signal (or if
 % % it works at all!) This is the hardest part of the final project, so don't
 % % get discouraged if you have issues in this section.
-
+% diastolicloc = maxk(diastolicloc,length(systolicloc));
+% overalltime = [];
+% overallmag = [];
+% tao_estimate = [];
+% i = 1;
+% if Pminloc(i) < diastolicloc(i)
+%   Pminloc = Pminloc(length(diastolicloc));
+% elseif diastolicloc(i) > Pminloc(i)
+%     diastolicloc = diastolicloc(length(Pminloc(i)));
+% end
+% minima = diastolicpeaks;
+% voltage = filtdata;
+% for i = 1:length(minima)-1
+%     if Pminloc(i) < diastolicloc(i)
+%         region = (Pminloc(i): diastolicloc(i));
+%     elseif Pminloc(i) > diastolicloc(i)
+%         region = (diastolicloc(i): Pminloc(i));
+%     elseif Pminloc(i) == 0 || diastolicloc(i) == 0
+%       Pminloc(i) = [ ] ;
+%    diastolicloc(i) = [ ];
+%     end
+% for i = 1:length(minima)-1
+%     if Pminloc(1)<diastolicloc(1)
+%         region = (Pminloc(i):diastolicloc(i));
+%     elseif Pminloc(1)<diastolicloc(2) && Pminloc(2)<diastolicloc(2)
+%         if i == 1
+%             i = 2;
+%         end
+%         region = (Pminloc(i):diastolicloc(i));
+%     else
+%         region = (Pminloc(i+3):diastolicloc(i));
+%     end
+%region = (Pminloc(i): diastolicloc(i));
 overalltime = [];
 overallmag = [];
 tao_estimate = [];
@@ -269,7 +333,6 @@ for i = 1:length(minima)-1
       Pminloc(i) = [ ] ;
       diastolicloc(i) = [ ];
     end
-%region = (Pminloc(i): diastolicloc(i));
  timex = time(region);
 overalltime = [overalltime timex' NaN];
 % Define starting point
@@ -306,7 +369,7 @@ title('Diastolic Time Constants of Heart Pressure Waveform')
 
 disp(['Heartrate: ', num2str(((length(peaks))/delaytime(length(delaytime)))*60), ' Beats/min ']) %avg beats per minute for rats is 300-400 BPM
 
-disp(['Average Diastolic Pressure: ', num2str(mean(diastolicpeaks)), ' mmHg      ', 'Average Systolic Pressure: ', num2str(mean(systolicpeaks)), ' mmHg '])
+disp(['Average Diastolic Pressure: ', num2str(-mean(minvalues)), ' mmHg      ', 'Average Systolic Pressure: ', num2str(mean(systolicpeaks)), ' mmHg '])
 % 
 disp(['Maximum Developed Pressure: ', num2str(mean(maxDP)), ' mmHg '])
 % 
