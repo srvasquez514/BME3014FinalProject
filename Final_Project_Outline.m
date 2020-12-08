@@ -308,7 +308,7 @@ disp(['Heartrate: ', num2str(((length(peaks))/delaytime(length(delaytime)))*60),
 
 disp(['Average Diastolic Pressure: ', num2str(mean(diastolicpeaks)), ' mmHg      ', 'Average Systolic Pressure: ', num2str(mean(systolicpeaks)), ' mmHg '])
 % 
-disp(['Maximum Developed Pressure: ', num2str(mean(Pmaxpeaks)), ' mmHg '])
+disp(['Maximum Developed Pressure: ', num2str(mean(maxDP)), ' mmHg '])
 % 
 disp(['Tao: ', num2str(mean(tao_estimate)), ' Units N/A'])
 % 
