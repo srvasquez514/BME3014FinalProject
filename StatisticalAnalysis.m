@@ -65,17 +65,17 @@ minDPDT = B(:,8);
  
  %% T-tests
  disp('T-Test')
- [h1, p1] = ttest2(heartbeat(1:6) , heartbeat(7:12));
+ [h1, p1] = ttest(heartbeat(1:6) , heartbeat(7:12),'Alpha',0.01);
  disp(['Heart rate (hval) ', num2str(h1), ' pval ',num2str(h1)]);
-  [h2, p2] = ttest2(distolicP(1:6) , distolicP(7:12));
+  [h2, p2] = ttest(distolicP(1:6) , distolicP(7:12),'Alpha',0.01);
  disp(['Diastp(hval) ', num2str(h2), ' pval ',num2str(h2)]);
- [h3, p3] = ttest2(systolicP(1:6) , systolicP(7:12));
+ [h3, p3] = ttest(systolicP(1:6) , systolicP(7:12),'Alpha',0.01);
  disp(['Systp(h val) ', num2str(h3), ' pval ',num2str(h3)]);
-  [h4, p4] = ttest2(maxDevP(1:6) , maxDevP(7:12));
+  [h4, p4] = ttest(maxDevP(1:6) , maxDevP(7:12),'Alpha',0.01);
  disp(['maxDevP(h val) ', num2str(h4), ' pval ',num2str(h4)]);
-   [h5, p5] = ttest2(tao(1:6) , tao(7:12));
+   [h5, p5] = ttest(tao(1:6) , tao(7:12),'Alpha',0.01);
  disp(['tao(h val) ', num2str(h5), ' pval ',num2str(h5)]);
-  [h6, p6] = ttest2(maxDPDT(1:6) , maxDPDT(7:12));
+  [h6, p6] = ttest(maxDPDT(1:6) , maxDPDT(7:12),'Alpha',0.01);
  disp(['maxDPDT(h val) ', num2str(h6), ' pval ',num2str(h6)]);
-   [h7, p7] = ttest2(minDPDT(1:6) , minDPDT(7:12));
+   [h7, p7] = ttest2(minDPDT(1:6) , minDPDT(7:12),'Alpha',0.01);
  disp(['minDPDT(h val) ', num2str(h7), ' pval ',num2str(h7)]);
