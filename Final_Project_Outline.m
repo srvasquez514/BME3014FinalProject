@@ -369,7 +369,7 @@ title('Diastolic Time Constants of Heart Pressure Waveform','FontSize',18)
 % 
 % 
 
-disp(['Heartrate: ', num2str(((length(peaks))/delaytime(length(delaytime)))*60), ' Beats/min ']) %avg beats per minute for rats is 300-400 BPM
+disp(['Heartrate: ', num2str(((length(systolicpeaks))/delaytime(length(delaytime)))*60), ' Beats/min ']) %avg beats per minute for rats is 300-400 BPM %avg beats per minute for rats is 300-400 BPM
 
 disp(['Average Diastolic Pressure: ', num2str(-mean(minvalues)), ' mmHg      ', 'Average Systolic Pressure: ', num2str(mean(systolicpeaks)), ' mmHg '])
 % 
