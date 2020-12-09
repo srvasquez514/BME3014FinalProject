@@ -44,12 +44,12 @@ title('Raw Unfiltered Heart Condition Data')
 %% Stop
 %isHealthy = 1; %%Delete at the very end****
 if isHealthy == 1  %filter for healthy hearts
-    LP = designfilt('lowpassfir','PassbandFrequency',8,...
-    'StopbandFrequency',40,'StopbandAttenuation',60,'SampleRate',Fs);
+    LP = designfilt('lowpassfir','PassbandFrequency',12,...
+    'StopbandFrequency',60,'StopbandAttenuation',70,'SampleRate',Fs);
     filtdata = filter(LP,heartwaveform);
 elseif isHealthy == 2  %filter for infracted hearts 
-      LP = designfilt('lowpassfir','PassbandFrequency',12,...
-    'StopbandFrequency',60,'StopbandAttenuation',70,'SampleRate',Fs);
+      LP = designfilt('lowpassfir','PassbandFrequency',8,...
+    'StopbandFrequency',40,'StopbandAttenuation',60,'SampleRate',Fs);
     filtdata = filter(LP,heartwaveform); 
 else
     disp('Invalid Heart State input. Please try again.')
@@ -137,7 +137,7 @@ title('Systolic Peaks of Heart Pressure Waveform')
 %MinPeakProminence try this command
 
 if isHealthy == 1
-    [peaks1,loc1] = findpeaks(-filtdata,'MinPeakDistance',+25); %Sham Data
+    [peaks1,loc1] = findpeaks(-filtdata,'MinPeakDistance',+25); %Sham 3 Data likes +30
 elseif strcmp( fname, 'Infarct 1.csv')
      [peaks1,loc1] = findpeaks(-filtdata,'MinPeakDistance',+55);
 elseif isHealthy == 2
