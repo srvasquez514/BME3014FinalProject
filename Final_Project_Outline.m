@@ -135,8 +135,9 @@ title('Systolic Peaks of Heart Pressure Waveform')
 % the original filtered signal to prove that your threshold is correct.
 
 %MinPeakProminence try this command
-
-if isHealthy == 1
+if strcmp( fname, 'Sham 3.csv')
+    [peaks1,loc1] = findpeaks(-filtdata,'MinPeakDistance',+30);
+elseif isHealthy == 1
     [peaks1,loc1] = findpeaks(-filtdata,'MinPeakDistance',+25); %Sham 3 Data likes +30
 elseif strcmp( fname, 'Infarct 1.csv')
      [peaks1,loc1] = findpeaks(-filtdata,'MinPeakDistance',+55);
