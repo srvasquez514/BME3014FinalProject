@@ -67,9 +67,10 @@ figure
 plot(time,heartwaveform, 'b-')
 hold on
 plot(delaytime,filtdata, 'r-')
-xlabel('Time (Seconds)')
-ylabel('Pressure (mmHg)')
-title('Low Pass vs. Raw Data Filtered Heart Condition')
+xlabel('Time (Seconds)','FontSize',16)
+ylabel('Pressure (mmHg)','FontSize',16)
+title('Low Pass vs. Raw Data Filtered Heart Condition','FontSize',18)
+legend('Raw Data','Filtered Data','FontSize',12)
 hold off
 
 %% Identify Local Maxima and Count for Heartbeats
@@ -96,10 +97,10 @@ end
 figure
 plot(delaytime,filtdata, 'b-')
 hold on
-plot(delaytime(maxlocal),filtdata(maxlocal), 'or')
-xlabel('Time (Seconds)')
-ylabel('Pressure (mmHg)')
-title('Local Maxima - Filtered Heart Condition')
+plot(delaytime(maxlocal),filtdata(maxlocal), 'or', 'MarkerSize',12)
+xlabel('Time (Seconds)', 'FontSize',16)
+ylabel('Pressure (mmHg)', 'FontSize',16)
+title('Local Maxima - Filtered Heart Condition', 'FontSize',18)
 
 %% Find peaks (Systolic)
 % Use the findpeaks() function to find the peaks of the cleaned signal.
@@ -124,10 +125,10 @@ disp(maxlocations);
 
 %% Plotting the Systolic Pressure
 figure
-plot(delaytime(systolicloc),systolicpeaks, 'o', delaytime,filtdata);  %Arrays need to be the same size so used 1:1016 to plot peaks.
-xlabel('Time(s)') 
-ylabel('Pressure (mmHg)')
-title('Systolic Peaks of Heart Pressure Waveform')
+plot(delaytime(systolicloc),systolicpeaks, 'o', delaytime,filtdata, 'MarkerSize',12);  %Arrays need to be the same size so used 1:1016 to plot peaks.
+xlabel('Time(s)', 'FontSize',16)
+ylabel('Pressure (mmHg)', 'FontSize',16)
+title('Systolic Peaks of Heart Pressure Waveform', 'FontSize',18)
 
 %% Find Minima (Diastolic) (inverted data set)
 % Do the same as with the systolic, however invert the signal in order to
@@ -187,10 +188,10 @@ end
 disp(minlocations);
 %% Plotting Distolic Pressure Waveform
 figure
-plot(delaytime(diastolicloc),diastolicpeaks, 'o', delaytime,-filtdata);  
-xlabel('Time(s)') 
-ylabel('Pressure (mmHg)')
-title('Minima (Diastolic) of Heart Pressure Waveform')
+plot(delaytime(diastolicloc),diastolicpeaks, 'o', delaytime,-filtdata, 'MarkerSize',12);  
+xlabel('Time(s)', 'FontSize',16) 
+ylabel('Pressure (mmHg)', 'FontSize',16)
+title('Minima (Diastolic) of Heart Pressure Waveform', 'FontSize',18)
 
 %% Maximum Developed Pressure
 % Maximum developed pressure is the mean of the difference between the
@@ -269,11 +270,11 @@ end
 figure
 plot(delaytime,filtdata)
 hold on
-plot(delaytime(Pmaxloc),filtdata(PmaxIndex), 'o')
-plot(delaytime(Pminloc),filtdata(PminIndex), 'bo')
-xlabel('Time(s)') 
-ylabel('Pressure (mmHg)')
-title('dp/dt of Heart Pressure Waveform')
+plot(delaytime(Pmaxloc),filtdata(PmaxIndex), 'o', 'MarkerSize',12)
+plot(delaytime(Pminloc),filtdata(PminIndex), 'bo', 'MarkerSize',12)
+xlabel('Time(s)','FontSize',16) 
+ylabel('Pressure (mmHg)','FontSize',16)
+title('dp/dt of Heart Pressure Waveform','FontSize',18)
 
 %% Diastolic Time Constant
 % % Find the diastolic time constant over a time range as noted in lecture.
@@ -357,9 +358,9 @@ figure
 plot(delaytime,filtdata,'b-')
 hold on
 plot(overalltime,overallmag,'r-')
-xlabel('Time(s)') 
-ylabel('Pressure (mmHg)')
-title('Diastolic Time Constants of Heart Pressure Waveform')
+xlabel('Time(s)','FontSize',16) 
+ylabel('Pressure (mmHg)','FontSize',16)
+title('Diastolic Time Constants of Heart Pressure Waveform','FontSize',18)
 
 %% Final Display of all Parameters to perform t and p tests on 
 % %Finally display your average diastolic and systolic pressures, your
