@@ -88,14 +88,31 @@ hold off %Deletes the Overlay to not interfere with future graphs
 level = mean(filtdata); %Defining the level to be the mean of filtdata after the lowpass filtering
 threshdata = false(size(filtdata)); %creating 0 and 1 as the code identifies points above the level (1) below the level (0)
 thresdata(filtdata > level) = true; %Assigns a 1 if the filtdata is above the level for that point.
-
+threshdataTrue = threshdata(threshdata == true);
 
 peakdata = islocalmax(filtdata); %Finding local Maxima of the peakdata for heart count
 maxlocal = find(peakdata); %Finding the max locations or indexes of the peakdata
 disp(maxlocal) %Displaying these max locations to the user
 
-%Finding the y values for to identify the max values of the max locations
-%by using the index of maxlocal
+for i = 1: length(maxlocal) %Creating a for loop to identify where the systolicpeaks index is less than the level 
+    if maxlocal(i) < level
+        maxlocal(i) = 0;
+    end
+end
+ peakdata(peakdata==0) = []; %Allocating for the zeros
+ maxlocal(maxlocal ==0) = []; 
+ 
+peakssssss = filtdata(maxlocal);
+
+for i = 1: length(peakssssss)
+    if peakssssss(i) < 50
+      peakssssss (i) = 0;
+      maxlocal(i) = 0;
+    end
+end
+ peakssssss(peakssssss==0) = []; %Allocating for the zeros
+ maxlocal(maxlocal ==0) = []; 
+
 maximumvalues = [];
 for i = 1:length(maxlocal)
     maximumvalues(i) = filtdata(maxlocal(i));
@@ -114,7 +131,7 @@ end
 figure
 plot(delaytime,filtdata, 'b-')
 hold on
-plot(delaytime(maxlocal),filtdata(maxlocal), 'or', 'MarkerSize',12)
+plot(delaytime(maxlocal),peakssssss, 'or', 'MarkerSize',12)
 xlabel('Time (Seconds)', 'FontSize',16)
 ylabel('Pressure (mmHg)', 'FontSize',16)
 title('Local Maxima - Filtered Heart Condition', 'FontSize',18)
