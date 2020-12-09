@@ -12,19 +12,17 @@ close all
 % from a healthy or infracted heart.
 % 
 %This code imports the original files and removes the header
-%I'm leaving it commented for now because it's a lot eaasier to run the code and check progress when you don't... 
-    %have to input the file name everytime -AZKA
 prompt=inputdlg('What is the filename?');
-fname=char(prompt);  
+%Defining the file name as what the user selects
+fname=char(prompt);
+%Eliminates the 23 lines of the header
 rawdata=dlmread(fname,',',23,0);
+%List creates and assigned the number 1 = Healthy, 2 = Infarcted
 list={'Healthy','Infarcted'};
 isHealthy=listdlg('PromptString', {'What type of heart is the data from?'},...
     'SelectionMode','single','ListString',list);
-% rawdata
-%fname = 'Sham1.csv';
-rawdata2 = importdata(fname);
-time = rawdata(:,1);
-heartwaveform = rawdata(:,2);
+time = rawdata(:,1); %Isolating time from the 1st column of the CSV
+heartwaveform = rawdata(:,2); %Isolating the Heart Wave Form Data from the 2nd column of the CSV
 %% Set sampling frequency
 Fs = 250; % Hz
 %% Design and Apply Low-Pass Filter to Raw Data Set
@@ -42,37 +40,43 @@ xlabel('Time (Seconds)')
 ylabel('Pressure (mmHg)')
 title('Raw Unfiltered Heart Condition Data')
 %% Stop
-%isHealthy = 1; %%Delete at the very end****
-if isHealthy == 1  %filter for healthy hearts
+if isHealthy == 1  %filter for healthy hearts with higher passband since there is less noise in the dara set.
     LP = designfilt('lowpassfir','PassbandFrequency',12,...
     'StopbandFrequency',60,'StopbandAttenuation',70,'SampleRate',Fs);
-    filtdata = filter(LP,heartwaveform);
-elseif isHealthy == 2  %filter for infracted hearts 
+    filtdata = filter(LP,heartwaveform); %Applying the filter to the data set
+elseif isHealthy == 2  %filter for infracted hearts with lower passband since there is more noise from this data set.
       LP = designfilt('lowpassfir','PassbandFrequency',8,...
     'StopbandFrequency',40,'StopbandAttenuation',60,'SampleRate',Fs);
-    filtdata = filter(LP,heartwaveform); 
+    filtdata = filter(LP,heartwaveform); %Applying the filter to the data set
 else
-    disp('Invalid Heart State input. Please try again.')
+    disp('Invalid Heart State input. Please try again.') %If the Data is not Healthy or Infarcted Invalid State will be output
 end
-
 %% Plotting the Filtered Data
 
 timedelay = grpdelay(LP); % find delay associated with low pass filter
-disp(timedelay(1));
-delay = timedelay(1);
+disp(timedelay(1)); %Displaying the delay to the user
+delay = timedelay(1); %Assigning the delay value to what the delay is for each filter
 filtdata = filtdata(delay:end); % account for this delay in dataset
 delaytime = time(1:length(filtdata));% Time of dataset accounting for time delay form filter
 %% Plot of LowPass Data & Raw Data
+% figure
+% plot(time,heartwaveform, 'b-') %Plot of original data in a blue line
+% hold on %Overlay two plots on top of each other
+% plot(delaytime,filtdata, 'r-') %Plot of lowpass data in a red line
+% xlabel('Time (Seconds)') 
+% ylabel('Pressure (mmHg)')
+% title('Low Pass vs. Raw Data Filtered Heart Condition')
+% hold off %Deletes the Overlay to not interfere with future graphs
+
 figure
-plot(time,heartwaveform, 'b-')
-hold on
-plot(delaytime,filtdata, 'r-')
+plot(time,heartwaveform, 'b-')  %Plot of original data in a blue line
+hold on  %Overlay two plots on top of each other
+plot(delaytime,filtdata, 'r-') %Plot of lowpass data in a red line
 xlabel('Time (Seconds)','FontSize',16)
 ylabel('Pressure (mmHg)','FontSize',16)
 title('Low Pass vs. Raw Data Filtered Heart Condition','FontSize',18)
 legend('Raw Data','Filtered Data','FontSize',12)
-hold off
-
+hold off %Deletes the Overlay to not interfere with future graphs
 %% Identify Local Maxima and Count for Heartbeats
 % You may use previous code you have created in earlier labs to perfrom
 % local maxima detection on the filtered signal. You should set your
@@ -81,19 +85,32 @@ hold off
 % It takes longer for the CPU to append to a vector than to change a vector
 % value.
 
-% level = 50;
-% threshdata = false(size(filtdata));
-% thresdata(filtdata > level) = true;
-% threshdiff = diff(threshdata);
+level = mean(filtdata); %Defining the level to be the mean of filtdata after the lowpass filtering
+threshdata = false(size(filtdata)); %creating 0 and 1 as the code identifies points above the level (1) below the level (0)
+thresdata(filtdata > level) = true; %Assigns a 1 if the filtdata is above the level for that point.
 
-peakdata = islocalmax(filtdata);
-maxlocal = find(peakdata);
-disp(maxlocal)
 
+peakdata = islocalmax(filtdata); %Finding local Maxima of the peakdata for heart count
+maxlocal = find(peakdata); %Finding the max locations or indexes of the peakdata
+disp(maxlocal) %Displaying these max locations to the user
+
+%Finding the y values for to identify the max values of the max locations
+%by using the index of maxlocal
 maximumvalues = [];
 for i = 1:length(maxlocal)
     maximumvalues(i) = filtdata(maxlocal(i));
 end
+
+%Plotting the max local data to visually verify how well the command is
+%working. 
+% figure
+% plot(delaytime,filtdata, 'b-')
+% hold on
+% plot(delaytime(maxlocal),filtdata(maxlocal), 'or')
+% xlabel('Time (Seconds)')
+% ylabel('Pressure (mmHg)')
+% title('Local Maxima - Filtered Heart Condition')
+
 figure
 plot(delaytime,filtdata, 'b-')
 hold on
@@ -101,41 +118,50 @@ plot(delaytime(maxlocal),filtdata(maxlocal), 'or', 'MarkerSize',12)
 xlabel('Time (Seconds)', 'FontSize',16)
 ylabel('Pressure (mmHg)', 'FontSize',16)
 title('Local Maxima - Filtered Heart Condition', 'FontSize',18)
-
 %% Find peaks (Systolic)
 % Use the findpeaks() function to find the peaks of the cleaned signal.
 % Plot the peaks over the cleaned signal to prove that your threshold is
 % correct.
 
-avgdata = mean(filtdata);
-[peaks,loc] = findpeaks(filtdata);
-systolicpeaks = (peaks);
-systolicloc = (loc);
-for i = 1: length(systolicpeaks)
+%Thresholding the peaks of the filtered data
+avgdata = mean(filtdata); %Using the avg of the data as the threshold/level value
+[peaks,loc] = findpeaks(filtdata); %Utilizing the findpeaks function to find the peaks of each waveform period
+systolicpeaks = (peaks); %Reassigning the peaks for clarity that these represent the systolicpeaks 
+systolicloc = (loc); %Reassigning the variable for loc for clarity to represent this value as systolicloc
+for i = 1: length(systolicpeaks) %Creating a for loop to identify where the systolicpeaks index is less than the level 
     if systolicpeaks(i) < avgdata
         systolicpeaks(i) = 0;
         systolicloc(i) = 0;
     end
 end
- systolicpeaks(systolicpeaks==0) = [];
- systolicloc(systolicloc ==0) = []; 
+ systolicpeaks(systolicpeaks==0) = []; %Allocating for the zeros
+ systolicloc(systolicloc ==0) = []; %Allocating for the zeros
 
-maxlocations = systolicloc;
-disp(maxlocations);
+maxlocations = systolicloc; %Defining the max locations as the systolic locations since this is before the data is inverted.
+disp(maxlocations); %Displaying these values to the user
 
 %% Plotting the Systolic Pressure
+% figure
+% plot(delaytime(systolicloc),systolicpeaks, 'o', delaytime,filtdata);
+% xlabel('Time(s)') 
+% ylabel('Pressure (mmHg)')
+% title('Systolic Peaks of Heart Pressure Waveform')
+
 figure
-plot(delaytime(systolicloc),systolicpeaks, 'o', delaytime,filtdata, 'MarkerSize',12);  %Arrays need to be the same size so used 1:1016 to plot peaks.
+plot(delaytime(systolicloc),systolicpeaks, 'o', delaytime,filtdata, 'MarkerSize',12); 
 xlabel('Time(s)', 'FontSize',16)
 ylabel('Pressure (mmHg)', 'FontSize',16)
 title('Systolic Peaks of Heart Pressure Waveform', 'FontSize',18)
-
 %% Find Minima (Diastolic) (inverted data set)
 % Do the same as with the systolic, however invert the signal in order to
 % find the diastolic minima occurance which now looks like a peak and thus you are able to use findpeaks(). Plot the occurances of the minima on
 % the original filtered signal to prove that your threshold is correct.
 
-%MinPeakProminence try this command
+%if and elseif statements created to find the correct diastolic peak
+%locations. For most of the Sham data the best distance was +25 but for the
+%Infarcted it was +30. There were two outliers where Sham 3 needed +30 amd
+%Infarct 1 needed +55. Additionally, since this is diastolic the inverse of
+%the filtdata was used or -filtdata. 
 if strcmp( fname, 'Sham 3.csv')
     [peaks1,loc1] = findpeaks(-filtdata,'MinPeakDistance',+30);
 elseif isHealthy == 1
@@ -147,52 +173,42 @@ elseif isHealthy == 2
  %55 for Infarct 1 and 30 for the rest of Infarct data
 end
 
-    
-
-% diastoliclocmax = islocalmax(loc1);
-% diastolicpeaksmax = islocalmax(peaks1);
-% avgdata = mean(-filtdata);
-% diastolicpeaks = (peaks1);
-% diastolicloc = (loc1);
-% for i = 1: length(diastolicloc)
-%     if diastolicpeaks(i) < avgdata
-%         diastolicpeaks(i) = 0;
-%         diastolicloc(i) = 0;
-%     end
-% end
-%  diastolicpeaks(diastolicpeaks==0) = [];
-%  diastolicloc(diastolicloc ==0) = []; 
-
-diastolicloc = []; 
+diastolicloc = []; %Creating the arrays for diastolic loc and disastolic peaks.
 diastolicpeaks = [];
-level = mean(-filtdata);
-k = 1;
-for i = 1:length(loc1)
-    if peaks1(i)<level
+level = mean(-filtdata); %Creating another level but now with the inverse of the filtered data. 
+k = 1; %assigning another indexing variable of k = 1
+for i = 1:length(loc1) %Using a for loop for the locations of the diastolic peaks
+    if peaks1(i)<level %Specificing if peaks index are less than the level to continue searching
         continue
     else
-        diastolicloc(k) = loc1(i);
-        diastolicpeaks(k) = peaks1(i);
-        k = k+1;
+        diastolicloc(k) = loc1(i); %Otherwise, if peaks1 > level than diastolicloc is equal to the index of loc1
+        diastolicpeaks(k) = peaks1(i); %Otherwise, if peaks1 > level than diastolicpeaks is equal to the index of peaks
+        k = k+1; %keep cycling through the loop
     end
 end
 
-peakdata = islocalmax(-filtdata);
+peakdata = islocalmax(-filtdata); %Finding localmax of the inverse filtdata
 maxlocal = find(peakdata);
 disp(maxlocal)
- minvalues = [];
+
+ minvalues = []; %Finding the min values of where the "max locations" are which is the min locations. 
 for i = 1:length(maxlocal)
-    minvalues(i) = -filtdata(maxlocal(i));
+    minvalues(i) = -filtdata(maxlocal(i)); 
 end
  minlocations = diastolicloc;
-disp(minlocations);
+disp(minlocations); %Setting min locations as the diastoliclocs
 %% Plotting Distolic Pressure Waveform
+% figure
+% plot(delaytime(diastolicloc),diastolicpeaks, 'o', delaytime,-filtdata);  
+% xlabel('Time(s)') 
+% ylabel('Pressure (mmHg)')
+% title('Minima (Diastolic) of Heart Pressure Waveform')
+
 figure
 plot(delaytime(diastolicloc),diastolicpeaks, 'o', delaytime,-filtdata, 'MarkerSize',12);  
 xlabel('Time(s)', 'FontSize',16) 
 ylabel('Pressure (mmHg)', 'FontSize',16)
 title('Minima (Diastolic) of Heart Pressure Waveform', 'FontSize',18)
-
 %% Maximum Developed Pressure
 % Maximum developed pressure is the mean of the difference between the
 % systolic and diastolic pressures. However, please remember that you may
@@ -205,7 +221,7 @@ disp(minlocations);
 %maxDP = average(systolic - diastolic)
 
 if maxlocations > 10
-  maxDP = mean((filtdata(maxlocations(1))-filtdata(minlocations))); 
+  maxDP = mean((filtdata(maxlocations(1))-filtdata(minlocations))); %Identifiying if the maxDP calculation should occur at the 1st or 2nd based on how many maxlocations there are.
 else 
    maxDP = mean((filtdata(maxlocations(2))-filtdata((minlocations)))); 
 end
@@ -215,12 +231,12 @@ end
 % findpeaks() function once more. Please plot the differentiated signal and
 % the peaks in order to prove that your are finding the peaks.
 
-derivolt=diff(filtdata);
-level = 5;
-[peaks2,loc2] = findpeaks(derivolt);
-Pmaxpeaks = (peaks2);
-Pmaxloc = (loc2);
-for i = 1:length(peaks2)
+derivolt=diff(filtdata); %Taking the derivative of the filtdata 
+level = 5; %Setting a level to compare the derivative of the filtdata to.
+[peaks2,loc2] = findpeaks(derivolt); %Finding rhe peaks of derivative of the filtdata
+Pmaxpeaks = (peaks2); %Assigning the variables with more clear names for future use in other code. 
+Pmaxloc = (loc2); %Assigning the variables with more clear names for future use in other code. 
+for i = 1:length(peaks2) %If peaks are less than the level then the index variables are equal to zero. 
     if Pmaxpeaks(i) < level
         Pmaxpeaks(i) = 0;
         Pmaxloc(i) = 0;
@@ -230,8 +246,8 @@ Pmaxpeaks(Pmaxpeaks==0) = [];
 Pmaxloc(Pmaxloc ==0) = []; 
 
 derivolt=diff(filtdata);
-i = 1;
-for value = 1:length(Pmaxpeaks)
+i = 1; %Defining the index i = 1
+for value = 1:length(Pmaxpeaks) %For loop to find the index values of the Pmaxpeaks from the derivolt value
     PmaxIndex(i) = find(derivolt == Pmaxpeaks(value));
     i = i+1;
 end
@@ -241,13 +257,13 @@ end
 % of pressure increase on the derivative graph to show that your threshold
 % was adequate.
 
-derivolt= diff(-filtdata);
+derivolt= diff(-filtdata);  %Taking the derivative of the -filtdata 
 % avgdata = mean(-derivolt);
-level = 5;
-[peaks3,loc3] = findpeaks(derivolt);
-Pminpeaks = (peaks3);
-Pminloc = (loc3);
-for i = 1: length(-Pminpeaks)
+level = 5; %Setting a level to compare the derivative of the filtdata.
+[peaks3,loc3] = findpeaks(derivolt); %Finding rhe peaks of derivative of the filtdata
+Pminpeaks = (peaks3); %Assigning the variables with more clear names for future use in other code.
+Pminloc = (loc3); %Assigning the variables with more clear names for future use in other code.
+for i = 1: length(-Pminpeaks) %If peaks are less than the level then the index variables are equal to zero. 
     if Pminpeaks(i) < level
         Pminpeaks(i) = 0;
        Pminloc(i) = 0;
@@ -257,7 +273,7 @@ Pminpeaks(Pminpeaks==0) = [];
 Pminloc(Pminloc ==0) = []; 
  derivolt=diff(-filtdata);
 i = 1;
-for value = 1:length(Pminpeaks)
+for value = 1:length(Pminpeaks)  %For loop to find the index values of the Pminpeaks from the derivolt value
     PminIndex(i) = find(derivolt == Pminpeaks(value));
     i = i+1;
 end
@@ -267,6 +283,15 @@ end
 % the minima and maxima (which should be samples) and plot it against the
 % original signal values at those occurances(aka samples).
 % 
+% figure
+% plot(delaytime,filtdata)
+% hold on
+% plot(delaytime(Pmaxloc),filtdata(PmaxIndex), 'o')
+% plot(delaytime(Pminloc),filtdata(PminIndex), 'bo')
+% xlabel('Time(s)') 
+% ylabel('Pressure (mmHg)')
+% title('dp/dt of Heart Pressure Waveform')
+
 figure
 plot(delaytime,filtdata)
 hold on
@@ -275,7 +300,6 @@ plot(delaytime(Pminloc),filtdata(PminIndex), 'bo', 'MarkerSize',12)
 xlabel('Time(s)','FontSize',16) 
 ylabel('Pressure (mmHg)','FontSize',16)
 title('dp/dt of Heart Pressure Waveform','FontSize',18)
-
 %% Diastolic Time Constant
 % % Find the diastolic time constant over a time range as noted in lecture.
 % % Please see the pressureerror and the pressureeqn Matlab functions and
@@ -284,51 +308,19 @@ title('dp/dt of Heart Pressure Waveform','FontSize',18)
 % % loop). Plot to show how well the curve fits the original signal (or if
 % % it works at all!) This is the hardest part of the final project, so don't
 % % get discouraged if you have issues in this section.
-% diastolicloc = maxk(diastolicloc,length(systolicloc));
-% overalltime = [];
-% overallmag = [];
-% tao_estimate = [];
-% i = 1;
-% if Pminloc(i) < diastolicloc(i)
-%   Pminloc = Pminloc(length(diastolicloc));
-% elseif diastolicloc(i) > Pminloc(i)
-%     diastolicloc = diastolicloc(length(Pminloc(i)));
-% end
-% minima = diastolicpeaks;
-% voltage = filtdata;
-% for i = 1:length(minima)-1
-%     if Pminloc(i) < diastolicloc(i)
-%         region = (Pminloc(i): diastolicloc(i));
-%     elseif Pminloc(i) > diastolicloc(i)
-%         region = (diastolicloc(i): Pminloc(i));
-%     elseif Pminloc(i) == 0 || diastolicloc(i) == 0
-%       Pminloc(i) = [ ] ;
-%    diastolicloc(i) = [ ];
-%     end
-% for i = 1:length(minima)-1
-%     if Pminloc(1)<diastolicloc(1)
-%         region = (Pminloc(i):diastolicloc(i));
-%     elseif Pminloc(1)<diastolicloc(2) && Pminloc(2)<diastolicloc(2)
-%         if i == 1
-%             i = 2;
-%         end
-%         region = (Pminloc(i):diastolicloc(i));
-%     else
-%         region = (Pminloc(i+3):diastolicloc(i));
-%     end
-%region = (Pminloc(i): diastolicloc(i));
-overalltime = [];
-overallmag = [];
-tao_estimate = [];
-i = 1;
-if diastolicloc(i) < Pminloc(i)
+
+overalltime = []; %Creating array for the overalltime values
+overallmag = []; %Creating array for the overallmag values
+tao_estimate = []; %Creating array for the tao estimate 
+i = 1; %Setting index to 1 
+if diastolicloc(i) < Pminloc(i) %Making sure these arrays are the same size before finding the region
 diastolicloc = diastolicloc(2:end);
 end
-minima = diastolicpeaks;
-voltage = filtdata;
-for i = 1:length(minima)-1
+minima = diastolicpeaks; %Setting the minima to the diastolic peaks
+voltage = filtdata; %Voltage is defined as the filtdata
+for i = 1:length(minima)-1 %Using this for loop to ensure the array's are the same sizes and are compatible. 
     if Pminloc(i) < diastolicloc(i)
-        region = (Pminloc(i): diastolicloc(i));
+        region = (Pminloc(i): diastolicloc(i)); %specifying the region for the tao constant to run through which is the lower portion of the graph
     elseif Pminloc(i) > diastolicloc(i)
         region = (diastolicloc(i): Pminloc(i));
     elseif Pminloc(i) == 0 || diastolicloc(i) == 0
@@ -336,7 +328,7 @@ for i = 1:length(minima)-1
       diastolicloc(i) = [ ];
     end
  timex = time(region);
-overalltime = [overalltime timex' NaN];
+overalltime = [overalltime timex' NaN]; %NaN to filter out NaN and only plot the time of the diastolic relaxation pressure. 
 % Define starting point
 % [Po,P1,tau]
 P0 = [1 1 1];
@@ -352,24 +344,30 @@ Pest = fmincon(anonfunc,P0,[],[],[],[],lb,ub);
 tao_estimate = [tao_estimate Pest(3)];
 
 fin = pressureeqn(Pest,timex);
-overallmag = [overallmag fin' NaN];
+overallmag = [overallmag fin' NaN]; %NaN to filter out NaN and only plot the magnitude of the diastolic relaxation pressure. 
 end
+% figure
+% plot(delaytime,filtdata,'b-') %Plotting the filtered data
+% hold on
+% plot(overalltime,overallmag,'r-') %Plotting the diastolic pressure decrease overlayed onto the filtered data for visual confirmation of this working correctly.
+% xlabel('Time(s)') 
+% ylabel('Pressure (mmHg)')
+% title('Diastolic Time Constants of Heart Pressure Waveform')
+
 figure
-plot(delaytime,filtdata,'b-')
-hold on
-plot(overalltime,overallmag,'r-')
+plot(delaytime,filtdata,'b-') %Plotting the filtered data
+hold on %Overlay on filtered data
+plot(overalltime,overallmag,'r-')  %Plotting the diastolic pressure decrease overlayed onto the filtered data for visual confirmation of this working correctly.
 xlabel('Time(s)','FontSize',16) 
 ylabel('Pressure (mmHg)','FontSize',16)
 title('Diastolic Time Constants of Heart Pressure Waveform','FontSize',18)
-
 %% Final Display of all Parameters to perform t and p tests on 
 % %Finally display your average diastolic and systolic pressures, your
 % %maximum deveoped pressure, your tau, and your maximum and minimum dp/dt
 % %values for the user to see on the command window. And thats it :D
 % 
 % 
-
-disp(['Heartrate: ', num2str(((length(systolicpeaks))/delaytime(length(delaytime)))*60), ' Beats/min ']) %avg beats per minute for rats is 300-400 BPM %avg beats per minute for rats is 300-400 BPM
+disp(['Heartrate: ', num2str(((length(systolicpeaks))/delaytime(length(delaytime)))*60), ' Beats/min ']) %avg beats per minute for rats is 300-400 BPM
 
 disp(['Average Diastolic Pressure: ', num2str(-mean(minvalues)), ' mmHg      ', 'Average Systolic Pressure: ', num2str(mean(systolicpeaks)), ' mmHg '])
 % 
@@ -377,4 +375,4 @@ disp(['Maximum Developed Pressure: ', num2str(mean(maxDP)), ' mmHg '])
 % 
 disp(['Tao: ', num2str(mean(tao_estimate)), ' Units N/A'])
 % 
-disp(['Maximum dp/dt Value: ', num2str(max(Pmaxpeaks)), ' mmHg/s ','        Minimum dp/dt Value: ', num2str(min(Pminpeaks)), ' mmHg/s '])
+disp(['Maximum dp/dt Value: ', num2str(max(Pmaxpeaks)), ' mmHg/s ','        Minimum dp/dt Value: ', num2str(min(-Pminpeaks)), ' mmHg/s '])
